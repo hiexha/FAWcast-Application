@@ -1,0 +1,823 @@
+{
+ "name": "FAWcast",
+ "version": "2026.10",
+ "trained_on": "BPI Fall Armyworm reports and NASA POWER weather, 55 provinces in 17 regions, Q3 2020 to Q4 2025 (1,210 province-quarters)",
+ "quarterly": {
+  "coef": {
+   "intercept": 4.106713275952444,
+   "tmin_l1": -0.12625205611852114,
+   "rain_l1": 0.0011985470010334829,
+   "hum_l1": -0.058216570330416224,
+   "Q2": -0.7557964960502767,
+   "Q3": -0.1628058024057148,
+   "Q4": -1.4638615464724192,
+   "lagY": 0.5548063733268389,
+   "nbR": 0.5244212034926815,
+   "larea1": 0.2150301557704499,
+   "lnat1": 0.37848048270233203
+  },
+  "u_region": {
+   "BARMM": -0.3772133779903758,
+   "CAR": 0.0462081246472894,
+   "I": -0.4421611448563258,
+   "II": 0.5586240436716755,
+   "III": -0.4800481765438584,
+   "IV-A": 0.6281898400582413,
+   "IV-B": -0.003805909417820774,
+   "IX": -0.55383918907387,
+   "NIR": 0.021400645740181322,
+   "V": 0.1179620164218127,
+   "VI": -0.4342414345969823,
+   "VII": 0.5113193248640584,
+   "VIII": 0.5537690072027743,
+   "X": 0.042164266525431295,
+   "XI": 0.04005667539478625,
+   "XII": -0.5104197615237047,
+   "XIII": 0.2820350494766933
+  },
+  "u_province": {
+   "Abra": 0.4896554313248862,
+   "Agusan del Norte": 0.1703991989176909,
+   "Agusan del Sur": 0.4201083875534767,
+   "Aklan": -0.14544922988836637,
+   "Apayao": -0.1540976627688094,
+   "Batangas": 0.14527944045300575,
+   "Biliran": -0.7527198136865103,
+   "Bohol": -0.033136920222074207,
+   "Bukidnon": 0.5099224303300961,
+   "Cagayan": 0.20654079645075957,
+   "Camarines Sur": 0.36463105858012806,
+   "Capiz": -0.3490936060008514,
+   "Cavite": 0.3171217399514382,
+   "Cebu": 0.6224876482435284,
+   "Davao de Oro": 0.09978676876264292,
+   "Davao del Norte": 0.06782545879407498,
+   "Davao del Sur": 0.10817476027687865,
+   "Davao Oriental": -0.2296173446026998,
+   "Ifugao": 0.7948745433328445,
+   "Ilocos Norte": -0.21557441198605812,
+   "Iloilo": -0.005967301655168704,
+   "Isabela": 0.4006466366800093,
+   "Kalinga": -0.1765339716607279,
+   "Laguna": 0.31913812507973516,
+   "Lanao del Norte": -0.28992681020190075,
+   "Leyte": 0.9816472832163318,
+   "Maguindanao del Norte": -0.37286199506652684,
+   "Maguindanao del Sur": -0.06191715003456049,
+   "Marinduque": -0.25642915883384093,
+   "Masbate": -0.2286670985331323,
+   "Misamis Occidental": -0.1935512670278475,
+   "Misamis Oriental": 0.022154516460979726,
+   "Mountain Province": -0.9006384875742277,
+   "Negros Occidental": -0.5552916048444091,
+   "Negros Oriental": 0.579958159644501,
+   "North Cotabato": -0.2212955117087544,
+   "Nueva Vizcaya": -0.09979006450526749,
+   "Oriental Mindoro": 0.14317724500385046,
+   "Palawan": -0.021254994369090004,
+   "Pampanga": -0.08706389776220906,
+   "Pangasinan": -0.2940640467073553,
+   "Quezon": 0.39809874174423987,
+   "Quirino": 0.13647715521675924,
+   "Rizal": -0.4555814321719947,
+   "Romblon": 0.13012018667868155,
+   "Samar": -0.22521526688289603,
+   "Sarangani": -0.7099514243971933,
+   "South Cotabato": 0.2316568300779239,
+   "Southern Leyte": 0.6345663674764336,
+   "Sultan Kudarat": 0.11127622188036597,
+   "Surigao del Sur": -0.2654317411941521,
+   "Tarlac": -0.46624345553743807,
+   "Zamboanga del Norte": -0.15857184885701253,
+   "Zamboanga del Sur": -0.15083521759815216,
+   "Zamboanga Sibugay": -0.3289523958520287
+  },
+  "performance": {
+   "cv_auc": 0.824,
+   "new_province_auc": 0.799,
+   "new_year_auc": 0.785,
+   "forward_auc": 0.773,
+   "cv_accuracy": 0.798
+  }
+ },
+ "monthly": {
+  "coef": {
+   "intercept": -8.394209897745998,
+   "tmin_l1": -0.015443281673488584,
+   "rain_l1": 0.020200257985110152,
+   "hum_l1": 0.06978601515930741,
+   "Q2": 0.32228666258504,
+   "Q3": -0.6138403580219082,
+   "Q4": -0.7770865047049667,
+   "lagY": 0.23603323349377542,
+   "nbR": 0.36424260400193453,
+   "larea1": 0.24482309408807781,
+   "lnat1": -0.2974076893268457,
+   "m1p": 0.399912056230594,
+   "m1r": 0.256755205189667,
+   "m1n": 0.41661212941289383
+  },
+  "u_region": {
+   "BARMM": -0.29194803314386863,
+   "CAR": -0.2693116341858633,
+   "I": -0.22973245209307652,
+   "II": 0.29530126859574185,
+   "III": 0.09835285216933917,
+   "IV-A": 0.3179226876282297,
+   "IV-B": -0.057200826155893475,
+   "IX": -0.35198787609578697,
+   "NIR": 0.20099424744175798,
+   "V": 0.0665654873291614,
+   "VI": -0.3676423802245567,
+   "VII": 0.39493983137698657,
+   "VIII": 0.3268279327344582,
+   "X": -0.13030880172650128,
+   "XI": 0.17052772093259777,
+   "XII": -0.2163817243991162,
+   "XIII": 0.04308169981639126
+  },
+  "u_province": {
+   "Abra": 0.32334366662040936,
+   "Agusan del Norte": -0.010563451374363786,
+   "Agusan del Sur": 0.26463269521791644,
+   "Aklan": -0.3771889519417842,
+   "Apayao": -0.3514472776292141,
+   "Batangas": 0.0233055082465001,
+   "Biliran": -0.3806809885708222,
+   "Bohol": 0.06317396360660907,
+   "Bukidnon": 0.28101146552744316,
+   "Cagayan": 0.030073742190768398,
+   "Camarines Sur": 0.16943196290418724,
+   "Capiz": -0.1881616068573818,
+   "Cavite": 0.40284031628433215,
+   "Cebu": 0.6208281381369835,
+   "Davao de Oro": 0.11029470859313611,
+   "Davao del Norte": 0.1648100342879824,
+   "Davao del Sur": 0.1557169902490908,
+   "Davao Oriental": -0.13548226555418907,
+   "Ifugao": 0.7535142168790142,
+   "Ilocos Norte": -0.4210363657550066,
+   "Iloilo": -0.07137468587127573,
+   "Isabela": 0.4622562364499674,
+   "Kalinga": -0.5073941791755084,
+   "Laguna": 0.5717780878971355,
+   "Lanao del Norte": -0.40045190713776224,
+   "Leyte": 0.5449007546578212,
+   "Maguindanao del Norte": -0.36023020604573397,
+   "Maguindanao del Sur": -0.14539888579357316,
+   "Marinduque": -0.28479299608340486,
+   "Masbate": -0.05414621652103332,
+   "Misamis Occidental": -0.13972042128322307,
+   "Misamis Oriental": 0.03347713292927713,
+   "Mountain Province": -0.6844412062994152,
+   "Negros Occidental": -0.28659957031962374,
+   "Negros Oriental": 0.6347044631819081,
+   "North Cotabato": -0.22137094444430513,
+   "Nueva Vizcaya": -0.07198720286531442,
+   "Oriental Mindoro": -0.1084038480500209,
+   "Palawan": 0.1086947768681742,
+   "Pampanga": 0.21841088461548175,
+   "Pangasinan": 0.02315935364786455,
+   "Quezon": 0.07942853451360292,
+   "Quirino": 0.09109383385393746,
+   "Rizal": -0.5267374690309066,
+   "Romblon": 0.18543511527996467,
+   "Samar": 0.025890564772059293,
+   "Sarangani": -0.43481783200250707,
+   "South Cotabato": -0.045630564819543085,
+   "Southern Leyte": 0.37592777200703364,
+   "Sultan Kudarat": 0.3270646507813088,
+   "Surigao del Sur": -0.17945541439425142,
+   "Tarlac": -0.0480721336170048,
+   "Zamboanga del Norte": -0.1379282770931175,
+   "Zamboanga del Sur": -0.19926059854579362,
+   "Zamboanga Sibugay": -0.2724241031238375
+  },
+  "performance": {
+   "cv_auc": 0.844,
+   "new_province_auc": 0.831,
+   "new_year_auc": 0.807,
+   "forward_auc": 0.798
+  }
+ },
+ "province_region": {
+  "Abra": "CAR",
+  "Agusan del Norte": "XIII",
+  "Agusan del Sur": "XIII",
+  "Aklan": "VI",
+  "Apayao": "CAR",
+  "Batangas": "IV-A",
+  "Biliran": "VIII",
+  "Bohol": "VII",
+  "Bukidnon": "X",
+  "Cagayan": "II",
+  "Camarines Sur": "V",
+  "Capiz": "VI",
+  "Cavite": "IV-A",
+  "Cebu": "VII",
+  "Davao de Oro": "XI",
+  "Davao del Norte": "XI",
+  "Davao del Sur": "XI",
+  "Davao Oriental": "XI",
+  "Ifugao": "CAR",
+  "Ilocos Norte": "I",
+  "Iloilo": "VI",
+  "Isabela": "II",
+  "Kalinga": "CAR",
+  "Laguna": "IV-A",
+  "Lanao del Norte": "X",
+  "Leyte": "VIII",
+  "Maguindanao del Norte": "BARMM",
+  "Maguindanao del Sur": "BARMM",
+  "Marinduque": "IV-B",
+  "Masbate": "V",
+  "Misamis Occidental": "X",
+  "Misamis Oriental": "X",
+  "Mountain Province": "CAR",
+  "Negros Occidental": "NIR",
+  "Negros Oriental": "NIR",
+  "North Cotabato": "XII",
+  "Nueva Vizcaya": "II",
+  "Oriental Mindoro": "IV-B",
+  "Palawan": "IV-B",
+  "Pampanga": "III",
+  "Pangasinan": "I",
+  "Quezon": "IV-A",
+  "Quirino": "II",
+  "Rizal": "IV-A",
+  "Romblon": "IV-B",
+  "Samar": "VIII",
+  "Sarangani": "XII",
+  "South Cotabato": "XII",
+  "Southern Leyte": "VIII",
+  "Sultan Kudarat": "XII",
+  "Surigao del Sur": "XIII",
+  "Tarlac": "III",
+  "Zamboanga del Norte": "IX",
+  "Zamboanga del Sur": "IX",
+  "Zamboanga Sibugay": "IX"
+ },
+ "ranges": {
+  "tmin": [
+   13.089999999999998,
+   27.820000000000004
+  ],
+  "rain": [
+   0.2933333333333333,
+   50.09
+  ],
+  "hum": [
+   64.26333333333334,
+   93.28333333333336
+  ],
+  "area": [
+   0,
+   19933.900000000012
+  ],
+  "national": [
+   48.99999999999999,
+   2498.9999999999995
+  ],
+  "m1p": [
+   0,
+   434.00000000000006
+  ],
+  "m1r": [
+   0,
+   693.9999999999999
+  ],
+  "m1n": [
+   12.999999999999996,
+   1407.9999999999995
+  ]
+ },
+ "tiers": [
+  {
+   "max": 0.3,
+   "name": "Low",
+   "action": "Continue routine field monitoring and standard pest management. Teach farmers to recognise and report Fall Armyworm."
+  },
+  {
+   "max": 0.5,
+   "name": "Moderate",
+   "action": "Increase field inspections, set up pheromone traps for early detection, and prepare control materials with the local agriculture office."
+  },
+  {
+   "max": 0.7,
+   "name": "High",
+   "action": "Start close monitoring in affected areas and apply integrated pest management promptly once infestation is confirmed."
+  },
+  {
+   "max": 1.01,
+   "name": "Very High",
+   "action": "Issue an outbreak advisory, intensify surveillance in nearby farms, and coordinate rapid intervention with agricultural authorities."
+  }
+ ],
+ "latest": {
+  "based_on": "2025 Q4",
+  "forecast_for": "2026 Q1",
+  "national_reports": 424,
+  "provinces": {
+   "Abra": {
+    "tmin": 21.03,
+    "rain": 6.72,
+    "hum": 83.88,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 43.5
+   },
+   "Agusan del Norte": {
+    "tmin": 21.87,
+    "rain": 11.54,
+    "hum": 88.86,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Agusan del Sur": {
+    "tmin": 21.71,
+    "rain": 8.4,
+    "hum": 86.95,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.5
+   },
+   "Aklan": {
+    "tmin": 24.41,
+    "rain": 11.63,
+    "hum": 89.07,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Apayao": {
+    "tmin": 19.85,
+    "rain": 7.87,
+    "hum": 91.74,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 35.0
+   },
+   "Batangas": {
+    "tmin": 22.91,
+    "rain": 14.15,
+    "hum": 90.66,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 1.0
+   },
+   "Biliran": {
+    "tmin": 26.01,
+    "rain": 9.55,
+    "hum": 84.89,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Bohol": {
+    "tmin": 25.45,
+    "rain": 9.23,
+    "hum": 86.39,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Bukidnon": {
+    "tmin": 17.38,
+    "rain": 6.18,
+    "hum": 89.95,
+    "lagY": 1,
+    "nbR": 0,
+    "area": 18.7
+   },
+   "Cagayan": {
+    "tmin": 22.19,
+    "rain": 8.95,
+    "hum": 89.17,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 31.6
+   },
+   "Camarines Sur": {
+    "tmin": 24.85,
+    "rain": 15.44,
+    "hum": 85.88,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Capiz": {
+    "tmin": 24.41,
+    "rain": 11.63,
+    "hum": 89.07,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Cavite": {
+    "tmin": 25.24,
+    "rain": 9.34,
+    "hum": 85.81,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Cebu": {
+    "tmin": 25.43,
+    "rain": 9.2,
+    "hum": 86.9,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 2.0
+   },
+   "Davao de Oro": {
+    "tmin": 21.26,
+    "rain": 5.98,
+    "hum": 88.61,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 9.3
+   },
+   "Davao del Norte": {
+    "tmin": 21.86,
+    "rain": 5.93,
+    "hum": 85.84,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 5.5
+   },
+   "Davao del Sur": {
+    "tmin": 25.11,
+    "rain": 4.4,
+    "hum": 79.63,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 3.0
+   },
+   "Davao Oriental": {
+    "tmin": 25.0,
+    "rain": 4.27,
+    "hum": 82.45,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Ifugao": {
+    "tmin": 17.84,
+    "rain": 10.08,
+    "hum": 92.12,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 34.8
+   },
+   "Ilocos Norte": {
+    "tmin": 22.41,
+    "rain": 6.24,
+    "hum": 84.55,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Iloilo": {
+    "tmin": 24.98,
+    "rain": 11.34,
+    "hum": 88.34,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Isabela": {
+    "tmin": 21.08,
+    "rain": 12.25,
+    "hum": 90.11,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 1014.0
+   },
+   "Kalinga": {
+    "tmin": 18.72,
+    "rain": 8.33,
+    "hum": 92.16,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 7.5
+   },
+   "Laguna": {
+    "tmin": 22.91,
+    "rain": 14.15,
+    "hum": 90.66,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Lanao del Norte": {
+    "tmin": 22.76,
+    "rain": 9.75,
+    "hum": 87.91,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 2.7
+   },
+   "Leyte": {
+    "tmin": 25.19,
+    "rain": 13.9,
+    "hum": 87.44,
+    "lagY": 1,
+    "nbR": 0,
+    "area": 5.5
+   },
+   "Maguindanao del Norte": {
+    "tmin": 19.54,
+    "rain": 8.86,
+    "hum": 86.79,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Maguindanao del Sur": {
+    "tmin": 21.15,
+    "rain": 6.76,
+    "hum": 85.97,
+    "lagY": 1,
+    "nbR": 0,
+    "area": 124.9
+   },
+   "Marinduque": {
+    "tmin": 25.7,
+    "rain": 11.64,
+    "hum": 86.52,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Masbate": {
+    "tmin": 25.97,
+    "rain": 12.21,
+    "hum": 87.08,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Misamis Occidental": {
+    "tmin": 25.36,
+    "rain": 9.62,
+    "hum": 85.03,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Misamis Oriental": {
+    "tmin": 20.28,
+    "rain": 7.66,
+    "hum": 87.34,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Mountain Province": {
+    "tmin": 17.84,
+    "rain": 10.08,
+    "hum": 92.12,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Negros Occidental": {
+    "tmin": 23.62,
+    "rain": 9.9,
+    "hum": 88.44,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Negros Oriental": {
+    "tmin": 24.17,
+    "rain": 8.39,
+    "hum": 86.18,
+    "lagY": 1,
+    "nbR": 0,
+    "area": 0.8
+   },
+   "North Cotabato": {
+    "tmin": 19.68,
+    "rain": 5.12,
+    "hum": 88.22,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Nueva Vizcaya": {
+    "tmin": 17.63,
+    "rain": 11.87,
+    "hum": 91.81,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 272.0
+   },
+   "Oriental Mindoro": {
+    "tmin": 22.45,
+    "rain": 8.57,
+    "hum": 90.74,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Palawan": {
+    "tmin": 26.18,
+    "rain": 8.5,
+    "hum": 83.98,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Pampanga": {
+    "tmin": 21.5,
+    "rain": 6.68,
+    "hum": 89.35,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Pangasinan": {
+    "tmin": 21.23,
+    "rain": 7.87,
+    "hum": 85.06,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Quezon": {
+    "tmin": 25.48,
+    "rain": 14.87,
+    "hum": 88.72,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Quirino": {
+    "tmin": 20.82,
+    "rain": 12.89,
+    "hum": 90.41,
+    "lagY": 1,
+    "nbR": 1,
+    "area": 156.0
+   },
+   "Rizal": {
+    "tmin": 22.51,
+    "rain": 14.29,
+    "hum": 90.1,
+    "lagY": 1,
+    "nbR": 0,
+    "area": 8.4
+   },
+   "Romblon": {
+    "tmin": 26.77,
+    "rain": 9.15,
+    "hum": 83.5,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Samar": {
+    "tmin": 24.74,
+    "rain": 13.67,
+    "hum": 87.51,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Sarangani": {
+    "tmin": 22.56,
+    "rain": 3.67,
+    "hum": 84.91,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "South Cotabato": {
+    "tmin": 21.62,
+    "rain": 3.7,
+    "hum": 85.8,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Southern Leyte": {
+    "tmin": 26.69,
+    "rain": 12.65,
+    "hum": 84.05,
+    "lagY": 0,
+    "nbR": 1,
+    "area": 0.0
+   },
+   "Sultan Kudarat": {
+    "tmin": 19.09,
+    "rain": 4.44,
+    "hum": 89.58,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Surigao del Sur": {
+    "tmin": 24.64,
+    "rain": 11.55,
+    "hum": 86.38,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 5.0
+   },
+   "Tarlac": {
+    "tmin": 21.29,
+    "rain": 7.35,
+    "hum": 88.12,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Zamboanga del Norte": {
+    "tmin": 25.01,
+    "rain": 9.31,
+    "hum": 85.95,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Zamboanga del Sur": {
+    "tmin": 21.82,
+    "rain": 9.82,
+    "hum": 90.93,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   },
+   "Zamboanga Sibugay": {
+    "tmin": 25.28,
+    "rain": 8.19,
+    "hum": 82.71,
+    "lagY": 0,
+    "nbR": 0,
+    "area": 0.0
+   }
+  }
+ },
+ "national_reports_by_quarter": {
+  "2020 Q1": 1182,
+  "2020 Q2": 1482,
+  "2020 Q3": 1390,
+  "2020 Q4": 1246,
+  "2021 Q1": 576,
+  "2021 Q2": 499,
+  "2021 Q3": 687,
+  "2021 Q4": 252,
+  "2022 Q1": 357,
+  "2022 Q2": 323,
+  "2022 Q3": 144,
+  "2022 Q4": 54,
+  "2023 Q1": 65,
+  "2023 Q2": 49,
+  "2023 Q3": 64,
+  "2023 Q4": 50,
+  "2024 Q1": 247,
+  "2024 Q2": 692,
+  "2024 Q3": 2499,
+  "2024 Q4": 515,
+  "2025 Q1": 744,
+  "2025 Q2": 654,
+  "2025 Q3": 1184,
+  "2025 Q4": 424
+ },
+ "means": {
+  "tmin_l1": 22.466606060606058,
+  "rain_l1": 7.9267079889807155,
+  "hum_l1": 83.93374655647384,
+  "lagY": 0.30991735537190085,
+  "nbR": 0.45289256198347105,
+  "larea1": 1.4108830060914863,
+  "lnat1": 5.884594921842271,
+  "m1p": 0.533875092175424,
+  "m1r": 1.2059303427996368,
+  "m1n": 4.683272057164248,
+  "Q2": 0.22727272727272727,
+  "Q3": 0.2727272727272727,
+  "Q4": 0.2727272727272727
+ },
+ "region_names": {
+  "CAR": "Cordillera Administrative Region",
+  "I": "Region I (Ilocos)",
+  "II": "Region II (Cagayan Valley)",
+  "III": "Region III (Central Luzon)",
+  "IV-A": "Region IV-A (CALABARZON)",
+  "IV-B": "Region IV-B (MIMAROPA)",
+  "V": "Region V (Bicol)",
+  "VI": "Region VI (Western Visayas)",
+  "NIR": "Negros Island Region",
+  "VII": "Region VII (Central Visayas)",
+  "VIII": "Region VIII (Eastern Visayas)",
+  "IX": "Region IX (Zamboanga Peninsula)",
+  "X": "Region X (Northern Mindanao)",
+  "XI": "Region XI (Davao)",
+  "XII": "Region XII (SOCCSKSARGEN)",
+  "XIII": "Region XIII (Caraga)",
+  "BARMM": "BARMM"
+ }
+}

@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FAWcast</title>
+<meta name="description" content="Fall Armyworm outbreak risk forecasts for Philippine corn provinces">
+<meta name="theme-color" content="#2f6b3f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script>window.FAWCAST_PWA = true;</script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: field-office tool. Inputs on the left, a sticky risk reading on the right, then a ranked outlook for every province. */
+:root{
+  --bg:#f4f6ef; --surface:#ffffff; --ink:#1c2a21; --muted:#5a6a5f; --line:#dce3d5; --soft:#eef2e8;
+  --accent:#2f6b3f; --accent-ink:#ffffff; --maize:#d9a40f;
+  --r-low:#2f8a52; --r-mod:#c99200; --r-high:#dd5e25; --r-vhigh:#b0212c;
+  --r-low-bg:#e3f1e7; --r-mod-bg:#fbf1d2; --r-high-bg:#fbe5da; --r-vhigh-bg:#f7dcde;
+  --warn-bg:#fff6dc; --warn-ink:#6b4e00;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111813; --surface:#18211b; --ink:#e6ede5; --muted:#9db0a2; --line:#2b372f; --soft:#1f2a22;
+  --accent:#86c896; --accent-ink:#0f1a12; --maize:#f0c540;
+  --r-low:#5cc283; --r-mod:#e7b53a; --r-high:#f08451; --r-vhigh:#f0646d;
+  --r-low-bg:#183323; --r-mod-bg:#33290c; --r-high-bg:#3a2216; --r-vhigh-bg:#3d1a1d;
+  --warn-bg:#33290c; --warn-ink:#f3d58a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111813; --surface:#18211b; --ink:#e6ede5; --muted:#9db0a2; --line:#2b372f; --soft:#1f2a22;
+  --accent:#86c896; --accent-ink:#0f1a12; --maize:#f0c540;
+  --r-low:#5cc283; --r-mod:#e7b53a; --r-high:#f08451; --r-vhigh:#f0646d;
+  --r-low-bg:#183323; --r-mod-bg:#33290c; --r-high-bg:#3a2216; --r-vhigh-bg:#3d1a1d;
+  --warn-bg:#33290c; --warn-ink:#f3d58a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{flex:none}
+.brand h1{font-size:2rem;font-stretch:112%;font-weight:800;letter-spacing:-.01em}
+.brand p{margin:0;color:var(--muted);font-size:.95rem}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.tabs button{border:0;background:none;color:var(--muted);font:600 .92rem var(--f-body);padding:7px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,.seg button:focus-visible{outline:2px solid var(--maize);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:24px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;gap:18px;min-width:0}
+.panel h2{font-size:1.15rem;font-stretch:105%}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
+legend{font-family:var(--f-display);font-weight:700;font-size:.98rem;margin-bottom:6px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+legend small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.85rem}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+label.f,div.f{display:grid;gap:4px;font-size:.88rem;font-weight:600;min-width:0;align-content:start}
+.f span.hint{font-weight:400;color:var(--muted);font-size:.8rem}
+input[type=number],select{width:100%;font:500 1rem var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.seg{display:inline-flex;width:max-content;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.seg button{border:0;background:none;padding:8px 16px;font:600 .92rem var(--f-body);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.q-row{display:flex;flex-wrap:wrap;gap:8px}
+.q-row button{flex:1 1 0;min-width:72px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 6px;cursor:pointer;color:var(--ink);font:600 .95rem var(--f-body);display:grid;justify-items:center;line-height:1.2}
+.q-row button small{font-weight:400;color:var(--muted);font-size:.75rem}
+.q-row button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:700 .92rem var(--f-body);padding:9px 14px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 12px;font-size:.88rem;display:grid;gap:4px}
+.warn:empty{display:none}
+/* result */
+.result{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:860px){.result{position:static}}
+.reading{display:grid;gap:6px}
+.prob{font-family:var(--f-display);font-weight:800;font-stretch:118%;font-size:4.2rem;line-height:1;letter-spacing:-.02em}
+.prob small{font-size:1.6rem;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.9rem;border-radius:999px;padding:4px 12px;width:max-content}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.t-Low{color:var(--r-low);background:var(--r-low-bg)} .t-Moderate{color:var(--r-mod);background:var(--r-mod-bg)}
+.t-High{color:var(--r-high);background:var(--r-high-bg)} .t-VeryHigh{color:var(--r-vhigh);background:var(--r-vhigh-bg)}
+.scale{position:relative;height:14px;border-radius:7px;display:grid;grid-template-columns:30fr 20fr 20fr 30fr;overflow:hidden}
+.scale i{display:block} .scale i:nth-child(1){background:var(--r-low)} .scale i:nth-child(2){background:var(--r-mod)} .scale i:nth-child(3){background:var(--r-high)} .scale i:nth-child(4){background:var(--r-vhigh)}
+.scale-wrap{position:relative;padding-top:6px}
+.marker{position:absolute;top:0;width:3px;height:26px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .35s ease}
+@media (prefers-reduced-motion:reduce){.marker{transition:none}}
+.ticks{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);font-family:var(--f-mono);margin-top:4px}
+.ticks span{flex:1;text-align:left} .ticks span:last-child{text-align:right;flex:none}
+.action{border-left:3px solid var(--maize);padding:2px 0 2px 12px;margin:0}
+.drivers{display:grid;gap:7px;font-size:.88rem}
+.drv{display:grid;grid-template-columns:minmax(0,1fr) 110px;align-items:center;gap:10px}
+.bar{position:relative;height:10px;background:var(--soft);border-radius:5px}
+.bar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--muted)}
+.bar b{position:absolute;top:0;height:10px;border-radius:5px}
+.bar b.up{left:50%;background:var(--r-high)} .bar b.down{right:50%;background:var(--r-low)}
+.meta{font-size:.8rem;color:var(--muted);display:grid;gap:2px}
+/* outlook */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.92rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);position:sticky;top:0}
+td.num,th.num{text-align:right}
+tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer} tbody tr:hover{background:var(--soft)}
+.minibar{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-left:8px;background:currentColor;opacity:.75}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.sec-head h2{font-size:1.4rem;font-stretch:108%}
+.about{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;font-size:.92rem}
+.about h3{font-size:1rem;margin-bottom:6px}
+.about p,.about ul{margin:0;color:var(--muted)} .about ul{padding-left:18px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;margin:0}
+.stats dt{color:var(--muted);font-size:.82rem} .stats dd{margin:0;font-family:var(--f-mono);font-weight:600}
+footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+.hidden-sm{display:inline} @media (max-width:520px){.hidden-sm{display:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="10" fill="var(--accent)"/><path d="M22 9c-5 6-7 12-7 18a7 7 0 0 0 14 0c0-6-2-12-7-18z" fill="var(--maize)"/><path d="M22 13v24M18 19l4 3 4-3M17.5 25l4.5 3 4.5-3M18 31l4 3 4-3" stroke="var(--accent)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <div>
+        <h1>FAWcast</h1>
+        <p>Fall Armyworm outbreak risk for Philippine corn provinces</p>
+      </div>
+    </div>
+    <div class="tabs" role="group" aria-label="Forecast type">
+      <button type="button" id="modeQ" aria-pressed="true">Quarterly forecast</button>
+      <button type="button" id="modeM" aria-pressed="false">Monthly update</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <form class="panel" id="form" autocomplete="off">
+      <div class="sec-head">
+        <h2 id="formTitle">Forecast the next quarter</h2>
+        <button type="button" class="btn ghost" id="fillLatest">Use latest data</button>
+      </div>
+      <p class="note" id="modeNote">Enter what happened in the province during the previous quarter. Every input is known before the forecast quarter begins.</p>
+
+      <fieldset>
+        <legend>Where and when</legend>
+        <label class="f" for="prov">Province
+          <select id="prov"></select>
+        </label>
+        <label class="f" for="regOther" id="regOtherWrap" hidden>Region of this province
+          <select id="regOther"></select>
+          <span class="hint">Provinces outside the 55 in the model use the region effect only (lower confidence).</span>
+        </label>
+        <div>
+          <div class="f" style="margin-bottom:4px;font-size:.88rem;font-weight:600" id="qLabel">Quarter to forecast</div>
+          <div class="q-row" role="group" aria-labelledby="qLabel">
+            <button type="button" data-q="1" id="q1">Q1<small>Jan–Mar</small></button>
+            <button type="button" data-q="2" id="q2">Q2<small>Apr–Jun</small></button>
+            <button type="button" data-q="3" id="q3">Q3<small>Jul–Sep</small></button>
+            <button type="button" data-q="4" id="q4">Q4<small>Oct–Dec</small></button>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Outbreak history <small>previous quarter, from BPI reports</small></legend>
+        <div class="grid2">
+          <div class="f">Outbreak in this province?
+            <span class="hint">Reports from 2 or more municipalities</span>
+            <div class="seg" role="group" aria-label="Outbreak in this province last quarter">
+              <button type="button" id="lagY1">Yes</button><button type="button" id="lagY0">No</button>
+            </div>
+          </div>
+          <div class="f">Outbreak in another province of the region?
+            <span class="hint">Any other province, same region</span>
+            <div class="seg" role="group" aria-label="Outbreak elsewhere in region last quarter">
+              <button type="button" id="nbR1">Yes</button><button type="button" id="nbR0">No</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid2">
+          <label class="f" for="area">Corn area in BPI reports (ha)
+            <input type="number" id="area" min="0" step="0.1" inputmode="decimal">
+            <span class="hint">Total "Area Planted" in this province's reports</span>
+          </label>
+          <label class="f" for="nat">BPI reports nationwide
+            <input type="number" id="nat" min="0" step="1" inputmode="numeric">
+            <span class="hint">All Fall Armyworm reports in the Philippines</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Weather <small>previous-quarter averages, NASA POWER</small></legend>
+        <div class="grid3">
+          <label class="f" for="tmin">Min. temperature (°C)<input type="number" id="tmin" step="0.01" inputmode="decimal"></label>
+          <label class="f" for="rain">Rainfall (mm/day)<input type="number" id="rain" min="0" step="0.01" inputmode="decimal"></label>
+          <label class="f" for="hum">Rel. humidity (%)<input type="number" id="hum" min="0" max="100" step="0.01" inputmode="decimal"></label>
+        </div>
+      </fieldset>
+
+      <fieldset id="monthBox" hidden>
+        <legend>First month of the quarter <small>BPI reports so far</small></legend>
+        <div class="grid3">
+          <label class="f" for="m1p">This province<input type="number" id="m1p" min="0" step="1" inputmode="numeric"></label>
+          <label class="f" for="m1r">Whole region<input type="number" id="m1r" min="0" step="1" inputmode="numeric"></label>
+          <label class="f" for="m1n">Nationwide<input type="number" id="m1n" min="0" step="1" inputmode="numeric"></label>
+        </div>
+      </fieldset>
+      <div class="warn" id="warn" role="status"></div>
+    </form>
+
+    <aside class="panel result" aria-live="polite">
+      <div class="reading">
+        <span class="eyebrow" id="resWhat">Outbreak probability</span>
+        <div class="prob num" id="prob">–</div>
+        <span class="pill" id="tier">–</span>
+      </div>
+      <div class="scale-wrap" aria-hidden="true">
+        <div class="scale"><i></i><i></i><i></i><i></i></div>
+        <div class="marker" id="marker" style="left:0%"></div>
+        <div class="ticks"><span>0</span><span>0.30</span><span>0.50</span><span>0.70</span><span>1.00</span></div>
+      </div>
+      <p class="action" id="action"></p>
+      <div>
+        <h3 style="font-size:.95rem;margin-bottom:8px">What moved the risk <span class="note hidden-sm">(compared with an average province-quarter)</span></h3>
+        <div class="drivers" id="drivers"></div>
+      </div>
+      <div class="meta" id="meta"></div>
+    </aside>
+  </div>
+
+  <section style="display:grid;gap:12px">
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" id="outlookEyebrow">Outlook</span>
+        <h2 id="outlookTitle">Next-quarter outlook for all 55 provinces</h2>
+      </div>
+      <label class="f" for="regFilter" style="min-width:220px">Show region
+        <select id="regFilter"></select>
+      </label>
+    </div>
+    <p class="note" id="outlookNote"></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Province</th><th>Region</th><th>Last quarter</th><th class="num">Probability</th><th>Risk</th></tr></thead>
+        <tbody id="outlook"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>About this model</h2>
+    <div class="about">
+      <div>
+        <h3>How it works</h3>
+        <p>FAWcast is a hierarchical logistic regression trained on <span id="trainedOn"></span>. It turns ten inputs into a probability with P = 1 / (1 + e<sup>−z</sup>), and adds a baseline adjustment for each region and province.</p>
+      </div>
+      <div>
+        <h3>How well it predicts</h3>
+        <dl class="stats" id="stats"></dl>
+      </div>
+      <div>
+        <h3>Use with care</h3>
+        <ul>
+          <li>An outbreak means BPI reports from 2 or more municipalities. Quiet reporting can hide real infestations.</li>
+          <li>Sudden outbreaks in provinces with no recent reports are hard to forecast a quarter ahead. Run the monthly update after the first month.</li>
+          <li>This is a decision-support baseline. Confirm risk with field scouting.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    FAWcast research project · M'lang National High School · Model version <span id="ver"></span> · Data: Bureau of Plant Industry (2020–2025), NASA POWER.
+    <span id="installWrap" hidden> · <button type="button" class="btn ghost" id="installBtn" style="padding:4px 10px">Install app</button></span>
+  </footer>
+</div>
+
+<script id="model-data" type="application/json">{"name":"FAWcast","version":"2026.10","trained_on":"BPI Fall Armyworm reports and NASA POWER weather, 55 provinces in 17 regions, Q3 2020 to Q4 2025 (1,210 province-quarters)","quarterly":{"coef":{"intercept":4.106713275952444,"tmin_l1":-0.12625205611852114,"rain_l1":0.0011985470010334829,"hum_l1":-0.058216570330416224,"Q2":-0.7557964960502767,"Q3":-0.1628058024057148,"Q4":-1.4638615464724192,"lagY":0.5548063733268389,"nbR":0.5244212034926815,"larea1":0.2150301557704499,"lnat1":0.37848048270233203},"u_region":{"BARMM":-0.3772133779903758,"CAR":0.0462081246472894,"I":-0.4421611448563258,"II":0.5586240436716755,"III":-0.4800481765438584,"IV-A":0.6281898400582413,"IV-B":-0.003805909417820774,"IX":-0.55383918907387,"NIR":0.021400645740181322,"V":0.1179620164218127,"VI":-0.4342414345969823,"VII":0.5113193248640584,"VIII":0.5537690072027743,"X":0.042164266525431295,"XI":0.04005667539478625,"XII":-0.5104197615237047,"XIII":0.2820350494766933},"u_province":{"Abra":0.4896554313248862,"Agusan del Norte":0.1703991989176909,"Agusan del Sur":0.4201083875534767,"Aklan":-0.14544922988836637,"Apayao":-0.1540976627688094,"Batangas":0.14527944045300575,"Biliran":-0.7527198136865103,"Bohol":-0.033136920222074207,"Bukidnon":0.5099224303300961,"Cagayan":0.20654079645075957,"Camarines Sur":0.36463105858012806,"Capiz":-0.3490936060008514,"Cavite":0.3171217399514382,"Cebu":0.6224876482435284,"Davao de Oro":0.09978676876264292,"Davao del Norte":0.06782545879407498,"Davao del Sur":0.10817476027687865,"Davao Oriental":-0.2296173446026998,"Ifugao":0.7948745433328445,"Ilocos Norte":-0.21557441198605812,"Iloilo":-0.005967301655168704,"Isabela":0.4006466366800093,"Kalinga":-0.1765339716607279,"Laguna":0.31913812507973516,"Lanao del Norte":-0.28992681020190075,"Leyte":0.9816472832163318,"Maguindanao del Norte":-0.37286199506652684,"Maguindanao del Sur":-0.06191715003456049,"Marinduque":-0.25642915883384093,"Masbate":-0.2286670985331323,"Misamis Occidental":-0.1935512670278475,"Misamis Oriental":0.022154516460979726,"Mountain Province":-0.9006384875742277,"Negros Occidental":-0.5552916048444091,"Negros Oriental":0.579958159644501,"North Cotabato":-0.2212955117087544,"Nueva Vizcaya":-0.09979006450526749,"Oriental Mindoro":0.14317724500385046,"Palawan":-0.021254994369090004,"Pampanga":-0.08706389776220906,"Pangasinan":-0.2940640467073553,"Quezon":0.39809874174423987,"Quirino":0.13647715521675924,"Rizal":-0.4555814321719947,"Romblon":0.13012018667868155,"Samar":-0.22521526688289603,"Sarangani":-0.7099514243971933,"South Cotabato":0.2316568300779239,"Southern Leyte":0.6345663674764336,"Sultan Kudarat":0.11127622188036597,"Surigao del Sur":-0.2654317411941521,"Tarlac":-0.46624345553743807,"Zamboanga del Norte":-0.15857184885701253,"Zamboanga del Sur":-0.15083521759815216,"Zamboanga Sibugay":-0.3289523958520287},"performance":{"cv_auc":0.824,"new_province_auc":0.799,"new_year_auc":0.785,"forward_auc":0.773,"cv_accuracy":0.798}},"monthly":{"coef":{"intercept":-8.394209897745998,"tmin_l1":-0.015443281673488584,"rain_l1":0.020200257985110152,"hum_l1":0.06978601515930741,"Q2":0.32228666258504,"Q3":-0.6138403580219082,"Q4":-0.7770865047049667,"lagY":0.23603323349377542,"nbR":0.36424260400193453,"larea1":0.24482309408807781,"lnat1":-0.2974076893268457,"m1p":0.399912056230594,"m1r":0.256755205189667,"m1n":0.41661212941289383},"u_region":{"BARMM":-0.29194803314386863,"CAR":-0.2693116341858633,"I":-0.22973245209307652,"II":0.29530126859574185,"III":0.09835285216933917,"IV-A":0.3179226876282297,"IV-B":-0.057200826155893475,"IX":-0.35198787609578697,"NIR":0.20099424744175798,"V":0.0665654873291614,"VI":-0.3676423802245567,"VII":0.39493983137698657,"VIII":0.3268279327344582,"X":-0.13030880172650128,"XI":0.17052772093259777,"XII":-0.2163817243991162,"XIII":0.04308169981639126},"u_province":{"Abra":0.32334366662040936,"Agusan del Norte":-0.010563451374363786,"Agusan del Sur":0.26463269521791644,"Aklan":-0.3771889519417842,"Apayao":-0.3514472776292141,"Batangas":0.0233055082465001,"Biliran":-0.3806809885708222,"Bohol":0.06317396360660907,"Bukidnon":0.28101146552744316,"Cagayan":0.030073742190768398,"Camarines Sur":0.16943196290418724,"Capiz":-0.1881616068573818,"Cavite":0.40284031628433215,"Cebu":0.6208281381369835,"Davao de Oro":0.11029470859313611,"Davao del Norte":0.1648100342879824,"Davao del Sur":0.1557169902490908,"Davao Oriental":-0.13548226555418907,"Ifugao":0.7535142168790142,"Ilocos Norte":-0.4210363657550066,"Iloilo":-0.07137468587127573,"Isabela":0.4622562364499674,"Kalinga":-0.5073941791755084,"Laguna":0.5717780878971355,"Lanao del Norte":-0.40045190713776224,"Leyte":0.5449007546578212,"Maguindanao del Norte":-0.36023020604573397,"Maguindanao del Sur":-0.14539888579357316,"Marinduque":-0.28479299608340486,"Masbate":-0.05414621652103332,"Misamis Occidental":-0.13972042128322307,"Misamis Oriental":0.03347713292927713,"Mountain Province":-0.6844412062994152,"Negros Occidental":-0.28659957031962374,"Negros Oriental":0.6347044631819081,"North Cotabato":-0.22137094444430513,"Nueva Vizcaya":-0.07198720286531442,"Oriental Mindoro":-0.1084038480500209,"Palawan":0.1086947768681742,"Pampanga":0.21841088461548175,"Pangasinan":0.02315935364786455,"Quezon":0.07942853451360292,"Quirino":0.09109383385393746,"Rizal":-0.5267374690309066,"Romblon":0.18543511527996467,"Samar":0.025890564772059293,"Sarangani":-0.43481783200250707,"South Cotabato":-0.045630564819543085,"Southern Leyte":0.37592777200703364,"Sultan Kudarat":0.3270646507813088,"Surigao del Sur":-0.17945541439425142,"Tarlac":-0.0480721336170048,"Zamboanga del Norte":-0.1379282770931175,"Zamboanga del Sur":-0.19926059854579362,"Zamboanga Sibugay":-0.2724241031238375},"performance":{"cv_auc":0.844,"new_province_auc":0.831,"new_year_auc":0.807,"forward_auc":0.798}},"province_region":{"Abra":"CAR","Agusan del Norte":"XIII","Agusan del Sur":"XIII","Aklan":"VI","Apayao":"CAR","Batangas":"IV-A","Biliran":"VIII","Bohol":"VII","Bukidnon":"X","Cagayan":"II","Camarines Sur":"V","Capiz":"VI","Cavite":"IV-A","Cebu":"VII","Davao de Oro":"XI","Davao del Norte":"XI","Davao del Sur":"XI","Davao Oriental":"XI","Ifugao":"CAR","Ilocos Norte":"I","Iloilo":"VI","Isabela":"II","Kalinga":"CAR","Laguna":"IV-A","Lanao del Norte":"X","Leyte":"VIII","Maguindanao del Norte":"BARMM","Maguindanao del Sur":"BARMM","Marinduque":"IV-B","Masbate":"V","Misamis Occidental":"X","Misamis Oriental":"X","Mountain Province":"CAR","Negros Occidental":"NIR","Negros Oriental":"NIR","North Cotabato":"XII","Nueva Vizcaya":"II","Oriental Mindoro":"IV-B","Palawan":"IV-B","Pampanga":"III","Pangasinan":"I","Quezon":"IV-A","Quirino":"II","Rizal":"IV-A","Romblon":"IV-B","Samar":"VIII","Sarangani":"XII","South Cotabato":"XII","Southern Leyte":"VIII","Sultan Kudarat":"XII","Surigao del Sur":"XIII","Tarlac":"III","Zamboanga del Norte":"IX","Zamboanga del Sur":"IX","Zamboanga Sibugay":"IX"},"ranges":{"tmin":[13.089999999999998,27.820000000000004],"rain":[0.2933333333333333,50.09],"hum":[64.26333333333334,93.28333333333336],"area":[0,19933.900000000012],"national":[48.99999999999999,2498.9999999999995],"m1p":[0,434.00000000000006],"m1r":[0,693.9999999999999],"m1n":[12.999999999999996,1407.9999999999995]},"tiers":[{"max":0.3,"name":"Low","action":"Continue routine field monitoring and standard pest management. Teach farmers to recognise and report Fall Armyworm."},{"max":0.5,"name":"Moderate","action":"Increase field inspections, set up pheromone traps for early detection, and prepare control materials with the local agriculture office."},{"max":0.7,"name":"High","action":"Start close monitoring in affected areas and apply integrated pest management promptly once infestation is confirmed."},{"max":1.01,"name":"Very High","action":"Issue an outbreak advisory, intensify surveillance in nearby farms, and coordinate rapid intervention with agricultural authorities."}],"latest":{"based_on":"2025 Q4","forecast_for":"2026 Q1","national_reports":424,"provinces":{"Abra":{"tmin":21.03,"rain":6.72,"hum":83.88,"lagY":1,"nbR":1,"area":43.5},"Agusan del Norte":{"tmin":21.87,"rain":11.54,"hum":88.86,"lagY":0,"nbR":0,"area":0.0},"Agusan del Sur":{"tmin":21.71,"rain":8.4,"hum":86.95,"lagY":0,"nbR":0,"area":0.5},"Aklan":{"tmin":24.41,"rain":11.63,"hum":89.07,"lagY":0,"nbR":0,"area":0.0},"Apayao":{"tmin":19.85,"rain":7.87,"hum":91.74,"lagY":1,"nbR":1,"area":35.0},"Batangas":{"tmin":22.91,"rain":14.15,"hum":90.66,"lagY":0,"nbR":1,"area":1.0},"Biliran":{"tmin":26.01,"rain":9.55,"hum":84.89,"lagY":0,"nbR":1,"area":0.0},"Bohol":{"tmin":25.45,"rain":9.23,"hum":86.39,"lagY":0,"nbR":0,"area":0.0},"Bukidnon":{"tmin":17.38,"rain":6.18,"hum":89.95,"lagY":1,"nbR":0,"area":18.7},"Cagayan":{"tmin":22.19,"rain":8.95,"hum":89.17,"lagY":1,"nbR":1,"area":31.6},"Camarines Sur":{"tmin":24.85,"rain":15.44,"hum":85.88,"lagY":0,"nbR":0,"area":0.0},"Capiz":{"tmin":24.41,"rain":11.63,"hum":89.07,"lagY":0,"nbR":0,"area":0.0},"Cavite":{"tmin":25.24,"rain":9.34,"hum":85.81,"lagY":0,"nbR":1,"area":0.0},"Cebu":{"tmin":25.43,"rain":9.2,"hum":86.9,"lagY":0,"nbR":0,"area":2.0},"Davao de Oro":{"tmin":21.26,"rain":5.98,"hum":88.61,"lagY":1,"nbR":1,"area":9.3},"Davao del Norte":{"tmin":21.86,"rain":5.93,"hum":85.84,"lagY":1,"nbR":1,"area":5.5},"Davao del Sur":{"tmin":25.11,"rain":4.4,"hum":79.63,"lagY":0,"nbR":1,"area":3.0},"Davao Oriental":{"tmin":25.0,"rain":4.27,"hum":82.45,"lagY":0,"nbR":1,"area":0.0},"Ifugao":{"tmin":17.84,"rain":10.08,"hum":92.12,"lagY":1,"nbR":1,"area":34.8},"Ilocos Norte":{"tmin":22.41,"rain":6.24,"hum":84.55,"lagY":0,"nbR":0,"area":0.0},"Iloilo":{"tmin":24.98,"rain":11.34,"hum":88.34,"lagY":0,"nbR":0,"area":0.0},"Isabela":{"tmin":21.08,"rain":12.25,"hum":90.11,"lagY":1,"nbR":1,"area":1014.0},"Kalinga":{"tmin":18.72,"rain":8.33,"hum":92.16,"lagY":0,"nbR":1,"area":7.5},"Laguna":{"tmin":22.91,"rain":14.15,"hum":90.66,"lagY":0,"nbR":1,"area":0.0},"Lanao del Norte":{"tmin":22.76,"rain":9.75,"hum":87.91,"lagY":0,"nbR":1,"area":2.7},"Leyte":{"tmin":25.19,"rain":13.9,"hum":87.44,"lagY":1,"nbR":0,"area":5.5},"Maguindanao del Norte":{"tmin":19.54,"rain":8.86,"hum":86.79,"lagY":0,"nbR":1,"area":0.0},"Maguindanao del Sur":{"tmin":21.15,"rain":6.76,"hum":85.97,"lagY":1,"nbR":0,"area":124.9},"Marinduque":{"tmin":25.7,"rain":11.64,"hum":86.52,"lagY":0,"nbR":0,"area":0.0},"Masbate":{"tmin":25.97,"rain":12.21,"hum":87.08,"lagY":0,"nbR":0,"area":0.0},"Misamis Occidental":{"tmin":25.36,"rain":9.62,"hum":85.03,"lagY":0,"nbR":1,"area":0.0},"Misamis Oriental":{"tmin":20.28,"rain":7.66,"hum":87.34,"lagY":0,"nbR":1,"area":0.0},"Mountain Province":{"tmin":17.84,"rain":10.08,"hum":92.12,"lagY":0,"nbR":1,"area":0.0},"Negros Occidental":{"tmin":23.62,"rain":9.9,"hum":88.44,"lagY":0,"nbR":1,"area":0.0},"Negros Oriental":{"tmin":24.17,"rain":8.39,"hum":86.18,"lagY":1,"nbR":0,"area":0.8},"North Cotabato":{"tmin":19.68,"rain":5.12,"hum":88.22,"lagY":0,"nbR":0,"area":0.0},"Nueva Vizcaya":{"tmin":17.63,"rain":11.87,"hum":91.81,"lagY":1,"nbR":1,"area":272.0},"Oriental Mindoro":{"tmin":22.45,"rain":8.57,"hum":90.74,"lagY":0,"nbR":0,"area":0.0},"Palawan":{"tmin":26.18,"rain":8.5,"hum":83.98,"lagY":0,"nbR":0,"area":0.0},"Pampanga":{"tmin":21.5,"rain":6.68,"hum":89.35,"lagY":0,"nbR":0,"area":0.0},"Pangasinan":{"tmin":21.23,"rain":7.87,"hum":85.06,"lagY":0,"nbR":0,"area":0.0},"Quezon":{"tmin":25.48,"rain":14.87,"hum":88.72,"lagY":0,"nbR":1,"area":0.0},"Quirino":{"tmin":20.82,"rain":12.89,"hum":90.41,"lagY":1,"nbR":1,"area":156.0},"Rizal":{"tmin":22.51,"rain":14.29,"hum":90.1,"lagY":1,"nbR":0,"area":8.4},"Romblon":{"tmin":26.77,"rain":9.15,"hum":83.5,"lagY":0,"nbR":0,"area":0.0},"Samar":{"tmin":24.74,"rain":13.67,"hum":87.51,"lagY":0,"nbR":1,"area":0.0},"Sarangani":{"tmin":22.56,"rain":3.67,"hum":84.91,"lagY":0,"nbR":0,"area":0.0},"South Cotabato":{"tmin":21.62,"rain":3.7,"hum":85.8,"lagY":0,"nbR":0,"area":0.0},"Southern Leyte":{"tmin":26.69,"rain":12.65,"hum":84.05,"lagY":0,"nbR":1,"area":0.0},"Sultan Kudarat":{"tmin":19.09,"rain":4.44,"hum":89.58,"lagY":0,"nbR":0,"area":0.0},"Surigao del Sur":{"tmin":24.64,"rain":11.55,"hum":86.38,"lagY":0,"nbR":0,"area":5.0},"Tarlac":{"tmin":21.29,"rain":7.35,"hum":88.12,"lagY":0,"nbR":0,"area":0.0},"Zamboanga del Norte":{"tmin":25.01,"rain":9.31,"hum":85.95,"lagY":0,"nbR":0,"area":0.0},"Zamboanga del Sur":{"tmin":21.82,"rain":9.82,"hum":90.93,"lagY":0,"nbR":0,"area":0.0},"Zamboanga Sibugay":{"tmin":25.28,"rain":8.19,"hum":82.71,"lagY":0,"nbR":0,"area":0.0}}},"national_reports_by_quarter":{"2020 Q1":1182,"2020 Q2":1482,"2020 Q3":1390,"2020 Q4":1246,"2021 Q1":576,"2021 Q2":499,"2021 Q3":687,"2021 Q4":252,"2022 Q1":357,"2022 Q2":323,"2022 Q3":144,"2022 Q4":54,"2023 Q1":65,"2023 Q2":49,"2023 Q3":64,"2023 Q4":50,"2024 Q1":247,"2024 Q2":692,"2024 Q3":2499,"2024 Q4":515,"2025 Q1":744,"2025 Q2":654,"2025 Q3":1184,"2025 Q4":424},"means":{"tmin_l1":22.466606060606058,"rain_l1":7.9267079889807155,"hum_l1":83.93374655647384,"lagY":0.30991735537190085,"nbR":0.45289256198347105,"larea1":1.4108830060914863,"lnat1":5.884594921842271,"m1p":0.533875092175424,"m1r":1.2059303427996368,"m1n":4.683272057164248,"Q2":0.22727272727272727,"Q3":0.2727272727272727,"Q4":0.2727272727272727},"region_names":{"CAR":"Cordillera Administrative Region","I":"Region I (Ilocos)","II":"Region II (Cagayan Valley)","III":"Region III (Central Luzon)","IV-A":"Region IV-A (CALABARZON)","IV-B":"Region IV-B (MIMAROPA)","V":"Region V (Bicol)","VI":"Region VI (Western Visayas)","NIR":"Negros Island Region","VII":"Region VII (Central Visayas)","VIII":"Region VIII (Eastern Visayas)","IX":"Region IX (Zamboanga Peninsula)","X":"Region X (Northern Mindanao)","XI":"Region XI (Davao)","XII":"Region XII (SOCCSKSARGEN)","XIII":"Region XIII (Caraga)","BARMM":"BARMM"}}</script>
+<script>
+(function(){
+  "use strict";
+  let M = JSON.parse(document.getElementById('model-data').textContent);
+  const $ = id => document.getElementById(id);
+  const state = { mode:'q', q:1, lagY:0, nbR:0 };
+  const qNames = {1:'Q1 (Jan–Mar)',2:'Q2 (Apr–Jun)',3:'Q3 (Jul–Sep)',4:'Q4 (Oct–Dec)'};
+  const tierClass = n => 't-' + n.replace(/\s/g,'');
+  const fmtPct = p => (p*100).toFixed(1);
+
+  function sigmoid(z){ return 1/(1+Math.exp(-z)); }
+  function tierOf(p){ return M.tiers.find(t => p < t.max); }
+
+  // Compute z and per-factor contributions (relative to the training average)
+  function score(mode, inp){
+    const m = mode === 'q' ? M.quarterly : M.monthly, c = m.coef, mu = M.means;
+    const x = {
+      tmin_l1: inp.tmin, rain_l1: inp.rain, hum_l1: inp.hum,
+      Q2: inp.q===2?1:0, Q3: inp.q===3?1:0, Q4: inp.q===4?1:0,
+      lagY: inp.lagY, nbR: inp.nbR, larea1: Math.log1p(inp.area), lnat1: Math.log1p(inp.nat),
+      m1p: Math.log1p(inp.m1p||0), m1r: Math.log1p(inp.m1r||0), m1n: Math.log1p(inp.m1n||0)
+    };
+    let z = c.intercept;
+    for (const k in c){ if (k !== 'intercept') z += c[k]*x[k]; }
+    const ur = inp.region ? (m.u_region[inp.region]||0) : 0;
+    const up = inp.known ? (m.u_province[inp.province]||0) : 0;
+    z += ur + up;
+    const d = k => (c[k]||0)*(x[k]-mu[k]);
+    const contrib = [
+      ['Outbreak in this province last quarter', d('lagY')],
+      ['Outbreak elsewhere in the region', d('nbR')],
+      ['Corn area in BPI reports', d('larea1')],
+      ['National reporting effort', d('lnat1')],
+      ['Season (quarter)', d('Q2')+d('Q3')+d('Q4')],
+      ['Weather of the previous quarter', d('tmin_l1')+d('rain_l1')+d('hum_l1')],
+      ['Province and region baseline', ur+up]
+    ];
+    if (mode === 'm') contrib.splice(4,0,['First-month reports', d('m1p')+d('m1r')+d('m1n')]);
+    return { z, p: sigmoid(z), contrib };
+  }
+
+  function readInputs(){
+    const pv = $('prov').value, other = pv === '__other';
+    const region = other ? ($('regOther').value === '__none' ? null : $('regOther').value) : M.province_region[pv];
+    const num = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : NaN; };
+    return { province: pv, known: !other, region, q: state.q, lagY: state.lagY, nbR: state.nbR,
+      area: num('area'), nat: num('nat'), tmin: num('tmin'), rain: num('rain'), hum: num('hum'),
+      m1p: num('m1p'), m1r: num('m1r'), m1n: num('m1n') };
+  }
+
+  function warnings(inp){
+    const w = [], R = M.ranges;
+    const chk = (v, r, label, unit) => { if (isFinite(v) && (v < r[0] || v > r[1])) w.push(`${label} (${v}${unit}) is outside the training range ${(+r[0]).toFixed(1)}–${(+r[1]).toFixed(1)}${unit}, so this result is an extrapolation.`); };
+    chk(inp.tmin, R.tmin, 'Minimum temperature', ' °C'); chk(inp.rain, R.rain, 'Rainfall', ' mm/day'); chk(inp.hum, R.hum, 'Relative humidity', '%');
+    chk(inp.area, R.area, 'Corn area', ' ha'); chk(inp.nat, R.national, 'National reports', '');
+    if (state.mode === 'm'){ chk(inp.m1p, R.m1p, 'First-month province reports', ''); chk(inp.m1r, R.m1r, 'First-month region reports', ''); chk(inp.m1n, R.m1n, 'First-month national reports', ''); }
+    if (!inp.known) w.push(inp.region ? 'This province was not in the training data, so only its region effect is used. On unseen provinces the model reached AUC 0.799; treat the result as a lower-confidence estimate.' : 'No province or region effect is used, so this is the national-average estimate. Treat it as a rough guide.');
+    return w;
+  }
+
+  function render(){
+    const inp = readInputs();
+    const need = ['area','nat','tmin','rain','hum'].concat(state.mode==='m'?['m1p','m1r','m1n']:[]);
+    const missing = need.filter(k => !isFinite(inp[k]));
+    const warn = $('warn');
+    if (missing.length){
+      $('prob').textContent = '–'; $('tier').textContent = 'Fill in all inputs'; $('tier').className = 'pill';
+      $('action').textContent = ''; $('drivers').innerHTML = ''; $('meta').innerHTML = ''; $('marker').style.left = '0%';
+      warn.innerHTML = state.mode === 'm' && missing.some(k => k.startsWith('m1')) ? '<span>Enter the number of BPI reports from the first month of the quarter (province, region and nationwide). These counts become available only after that month ends.</span>' : '<span>Some inputs are empty. Fill them in, or tap “Use latest data”.</span>';
+      return;
+    }
+    const r = score(state.mode, inp), t = tierOf(r.p);
+    $('prob').innerHTML = fmtPct(r.p) + '<small>%</small>';
+    $('tier').textContent = t.name + ' Risk'; $('tier').className = 'pill ' + tierClass(t.name);
+    $('marker').style.left = (Math.min(Math.max(r.p,0),1)*100) + '%';
+    $('action').textContent = t.action;
+    $('resWhat').textContent = state.mode === 'q' ? `Outbreak probability, ${qNames[state.q]}` : `Outbreak probability, months 2–3 of ${qNames[state.q]}`;
+    const maxAbs = Math.max(1, ...r.contrib.map(c => Math.abs(c[1])));
+    $('drivers').innerHTML = r.contrib.map(([name, v]) => {
+      const w = Math.min(50, Math.abs(v)/maxAbs*50);
+      const dir = v > 0.02 ? 'raises' : (v < -0.02 ? 'lowers' : 'no effect');
+      return `<div class="drv"><span>${name} <span class="note">· ${dir}</span></span><div class="bar" title="${v.toFixed(2)} on the log-odds scale"><b class="${v>=0?'up':'down'}" style="width:${w}%"></b></div></div>`;
+    }).join('');
+    warn.innerHTML = warnings(inp).map(s => `<span>${s}</span>`).join('');
+    const perf = (state.mode==='q'?M.quarterly:M.monthly).performance;
+    $('meta').innerHTML = `<span>z = ${r.z.toFixed(3)} · ${state.mode==='q'?'quarterly model (10 predictors)':'monthly update (13 predictors)'}</span><span>Tested accuracy: AUC ${perf.cv_auc} in cross-validation, ${perf.forward_auc} on later years.</span>`;
+  }
+
+  function setMode(m){
+    state.mode = m;
+    $('modeQ').setAttribute('aria-pressed', m==='q'); $('modeM').setAttribute('aria-pressed', m==='m');
+    $('monthBox').hidden = m !== 'm';
+    $('formTitle').textContent = m==='q' ? 'Forecast the next quarter' : 'Update after the first month';
+    $('modeNote').textContent = m==='q'
+      ? 'Enter what happened in the province during the previous quarter. Every input is known before the forecast quarter begins.'
+      : 'Use this after the first month of the quarter. It adds that month’s BPI report counts and predicts an outbreak in the remaining two months.';
+    $('qLabel').textContent = m==='q' ? 'Quarter to forecast' : 'Current quarter';
+    try{ localStorage.setItem('fawcast-mode', m); }catch(e){}
+    render();
+  }
+  function setQ(q){ state.q = q; [1,2,3,4].forEach(i => $('q'+i).setAttribute('aria-pressed', i===q)); render(); }
+  function setToggle(key, v){ state[key] = v; $(key+'1').setAttribute('aria-pressed', v===1); $(key+'0').setAttribute('aria-pressed', v===0); render(); }
+
+  function fillLatest(){
+    const pv = $('prov').value;
+    const L = M.latest.provinces[pv] || null;
+    $('nat').value = M.latest.national_reports;
+    if (L){
+      $('tmin').value = L.tmin; $('rain').value = L.rain; $('hum').value = L.hum; $('area').value = L.area;
+      setToggle('lagY', L.lagY); setToggle('nbR', L.nbR);
+    }
+    setQ(+M.latest.forecast_for.slice(-1));
+  }
+
+  function buildSelectors(){
+    const byReg = {};
+    Object.entries(M.province_region).forEach(([p,r]) => (byReg[r] = byReg[r] || []).push(p));
+    const order = Object.keys(M.region_names);
+    $('prov').innerHTML = order.filter(r => byReg[r]).map(r => `<optgroup label="${M.region_names[r]}">${byReg[r].sort().map(p => `<option value="${p}">${p}</option>`).join('')}</optgroup>`).join('')
+      + `<optgroup label="Other"><option value="__other">My province is not listed</option></optgroup>`;
+    $('regOther').innerHTML = order.map(r => `<option value="${r}">${M.region_names[r]}</option>`).join('') + '<option value="__none">Not sure / none</option>';
+    $('regFilter').innerHTML = '<option value="__all">All regions</option>' + order.filter(r => byReg[r]).map(r => `<option value="${r}">${M.region_names[r]}</option>`).join('');
+  }
+
+  function renderOutlook(){
+    const f = $('regFilter').value, L = M.latest, fq = +L.forecast_for.slice(-1);
+    const rows = Object.entries(L.provinces).map(([p, v]) => {
+      const r = score('q', { province:p, known:true, region:M.province_region[p], q:fq, lagY:v.lagY, nbR:v.nbR, area:v.area, nat:L.national_reports, tmin:v.tmin, rain:v.rain, hum:v.hum });
+      return { p, reg: M.province_region[p], v, prob: r.p, t: tierOf(r.p) };
+    }).filter(x => f === '__all' || x.reg === f).sort((a,b) => b.prob - a.prob);
+    $('outlook').innerHTML = rows.map((x,i) => `<tr data-p="${x.p}"><td class="num">${i+1}</td><td>${x.p}</td><td>${x.reg}</td><td>${x.v.lagY ? 'Outbreak' : 'No outbreak'}</td><td class="num">${fmtPct(x.prob)}%<span class="minibar ${tierClass(x.t.name)}" style="width:${Math.round(x.prob*60)}px;background:none;border-top:8px solid currentColor;height:0"></span></td><td><span class="pill ${tierClass(x.t.name)}">${x.t.name}</span></td></tr>`).join('');
+    const counts = M.tiers.map(t => `${rows.filter(x => x.t.name===t.name).length} ${t.name}`).join(' · ');
+    $('outlookTitle').textContent = `${L.forecast_for.replace(' ', ' ')} outlook${f==='__all' ? ' for all 55 provinces' : ''}`;
+    $('outlookEyebrow').textContent = `Based on BPI and NASA POWER data for ${L.based_on}`;
+    $('outlookNote').textContent = `Quarterly model with each province's ${L.based_on} data and ${L.national_reports} BPI reports nationwide. ${counts}. Tap a province to open it above.`;
+  }
+
+  function boot(){
+    buildSelectors();
+    $('trainedOn').textContent = M.trained_on.charAt(0).toLowerCase() + M.trained_on.slice(1);
+    $('ver').textContent = M.version;
+    const P = M.quarterly.performance;
+    $('stats').innerHTML = `<dt>Cross-validation AUC</dt><dd>${P.cv_auc}</dd><dt>Unseen provinces AUC</dt><dd>${P.new_province_auc}</dd><dt>Unseen years AUC</dt><dd>${P.new_year_auc}</dd><dt>Forecasting later years</dt><dd>${P.forward_auc}</dd><dt>Accuracy (CV)</dt><dd>${(P.cv_accuracy*100).toFixed(1)}%</dd><dt>Monthly update AUC</dt><dd>${M.monthly.performance.cv_auc}</dd>`;
+    $('modeQ').onclick = () => setMode('q'); $('modeM').onclick = () => setMode('m');
+    [1,2,3,4].forEach(i => $('q'+i).onclick = () => setQ(i));
+    ['lagY','nbR'].forEach(k => { $(k+'1').onclick = () => setToggle(k,1); $(k+'0').onclick = () => setToggle(k,0); });
+    $('prov').onchange = () => { $('regOtherWrap').hidden = $('prov').value !== '__other'; try{ localStorage.setItem('fawcast-prov', $('prov').value); }catch(e){} if ($('prov').value !== '__other') fillLatest(); else render(); };
+    $('regOther').onchange = render;
+    $('fillLatest').onclick = fillLatest;
+    $('form').addEventListener('input', render);
+    $('form').addEventListener('submit', e => e.preventDefault());
+    $('regFilter').onchange = renderOutlook;
+    $('outlook').onclick = e => { const tr = e.target.closest('tr'); if (!tr) return; $('prov').value = tr.dataset.p; $('regOtherWrap').hidden = true; setMode('q'); fillLatest(); $('form').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); };
+    let saved = null, savedMode = null;
+    try{ saved = localStorage.getItem('fawcast-prov'); savedMode = localStorage.getItem('fawcast-mode'); }catch(e){}
+    $('prov').value = (saved && (M.province_region[saved] || saved==='__other')) ? saved : 'Isabela';
+    $('regOtherWrap').hidden = $('prov').value !== '__other';
+    fillLatest();
+    renderOutlook();
+    setMode(savedMode === 'm' ? 'm' : 'q');
+  }
+
+  // Use a retrained model.json placed next to the app, if one exists
+  function start(){
+    fetch('model.json', {cache:'no-store'}).then(r => r.ok ? r.json() : null).then(j => { if (j && j.quarterly && j.monthly) M = j; }).catch(() => {}).finally(boot);
+  }
+  start();
+
+  // Installable app support (only active when hosted as a web app)
+  let deferred = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('installWrap').hidden = false; });
+  $('installBtn').onclick = () => { if (deferred){ deferred.prompt(); deferred = null; $('installWrap').hidden = true; } };
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && window.FAWCAST_PWA){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+
+</body>
+</html>
