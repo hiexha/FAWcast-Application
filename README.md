@@ -69,13 +69,19 @@ To add a province, add a row to `provinces.csv` and its weather to `weather_mont
 
 ## How to use the app
 
-- **Quarterly forecast:** choose a province and the quarter to forecast, then enter what
-  happened in the previous quarter. **Use latest data** fills in the newest values in
-  `model.json` (Q4 2025, forecasting Q1 2026).
-- **Monthly update:** use this after the first month of a quarter. Enter that month's BPI
-  report counts for the province, its region and the whole country. It predicts an
-  outbreak in the remaining two months.
-- **Outlook table:** ranks all 55 provinces for the next quarter. Tap a row to open it.
+The app has six pages (bottom bar on phones, top bar on computers):
+
+- **Forecast:** choose a province and quarter, then enter what happened in the previous quarter.
+  **Use latest data** fills in the newest values. Switch to **Monthly update** after the first month
+  of a quarter and enter that month's BPI report counts.
+- **Map:** every province colored by next-quarter risk. Switch to **Past outbreaks** to see how often
+  each province had an outbreak. Tap a province for its details.
+- **Guide:** simple steps for farmers at each risk level, how to spot Fall Armyworm, how to check a
+  field, ways to control it, and who to contact. Based on the DA's Fall Armyworm leaflet.
+- **Rankings:** all 55 provinces grouped by risk level. Filter by region or search by name.
+- **History:** each quarter since 2020 for one province: whether an outbreak happened, how many
+  municipalities reported, and the model's estimate. Also shows the riskiest season.
+- **About:** how the model works, its accuracy, and what each of the ten inputs does.
 
 Risk tiers: Low (below 30%), Moderate (30–49%), High (50–69%), Very High (70% and above).
 

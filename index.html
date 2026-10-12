@@ -17,51 +17,88 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=Source+Sans+3:wght@400;600;700&display=swap">
 <style>
-/* Layout: field-office tool. Inputs on the left, a sticky risk reading on the right, then a ranked outlook for every province. */
+/* FAWcast: a field-office tool. Five views (Forecast, Map, Rankings, History, About) behind one nav: bottom bar on phones, header tabs on wide screens. */
 :root{
   --bg:#f4f6ef; --surface:#ffffff; --ink:#1c2a21; --muted:#5a6a5f; --line:#dce3d5; --soft:#eef2e8;
   --accent:#2f6b3f; --accent-ink:#ffffff; --maize:#d9a40f;
   --r-low:#2f8a52; --r-mod:#c99200; --r-high:#dd5e25; --r-vhigh:#b0212c;
   --r-low-bg:#e3f1e7; --r-mod-bg:#fbf1d2; --r-high-bg:#fbe5da; --r-vhigh-bg:#f7dcde;
+  --m-low:#7cc191; --m-mod:#f0c64a; --m-high:#ec8a4f; --m-vhigh:#c4323b;
+  --s1:#f7e9bf; --s2:#f1b65e; --s3:#df6f30; --s4:#a8232c; --nomodel:#dde2d8; --mapline:#ffffff;
   --warn-bg:#fff6dc; --warn-ink:#6b4e00;
   --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
   --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
-  --radius:10px;
+  --radius:12px; --navh:64px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111813; --surface:#18211b; --ink:#e6ede5; --muted:#9db0a2; --line:#2b372f; --soft:#1f2a22;
   --accent:#86c896; --accent-ink:#0f1a12; --maize:#f0c540;
   --r-low:#5cc283; --r-mod:#e7b53a; --r-high:#f08451; --r-vhigh:#f0646d;
   --r-low-bg:#183323; --r-mod-bg:#33290c; --r-high-bg:#3a2216; --r-vhigh-bg:#3d1a1d;
+  --m-low:#2f7a4b; --m-mod:#b88f1c; --m-high:#d0652e; --m-vhigh:#e8545d;
+  --s1:#4a4224; --s2:#8f6a24; --s3:#c9622d; --s4:#f06a6a; --nomodel:#2a332d; --mapline:#111813;
   --warn-bg:#33290c; --warn-ink:#f3d58a; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111813; --surface:#18211b; --ink:#e6ede5; --muted:#9db0a2; --line:#2b372f; --soft:#1f2a22;
   --accent:#86c896; --accent-ink:#0f1a12; --maize:#f0c540;
   --r-low:#5cc283; --r-mod:#e7b53a; --r-high:#f08451; --r-vhigh:#f0646d;
   --r-low-bg:#183323; --r-mod-bg:#33290c; --r-high-bg:#3a2216; --r-vhigh-bg:#3d1a1d;
+  --m-low:#2f7a4b; --m-mod:#b88f1c; --m-high:#d0652e; --m-vhigh:#e8545d;
+  --s1:#4a4224; --s2:#8f6a24; --s3:#c9622d; --s4:#f06a6a; --nomodel:#2a332d; --mapline:#111813;
   --warn-bg:#33290c; --warn-ink:#f3d58a; color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;margin:0}
-.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:28px}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:16px calc(var(--navh) + 32px + env(safe-area-inset-bottom,0px));display:grid;gap:22px}
+@media (min-width:861px){.wrap{padding-block:20px 48px}}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
-.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
 .eyebrow{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:14px}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--maize);outline-offset:2px}
+
+/* header + nav */
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand svg{flex:none}
-.brand h1{font-size:2rem;font-stretch:112%;font-weight:800;letter-spacing:-.01em}
-.brand p{margin:0;color:var(--muted);font-size:.95rem}
-.tabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
-.tabs button{border:0;background:none;color:var(--muted);font:600 .92rem var(--f-body);padding:7px 14px;border-radius:999px;cursor:pointer}
-.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
-.tabs button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,.seg button:focus-visible{outline:2px solid var(--maize);outline-offset:2px}
-.main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:24px;align-items:start}
-@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;gap:18px;min-width:0}
+.brand h1{font-size:1.8rem;font-stretch:112%;font-weight:800;letter-spacing:-.01em}
+.brand p{margin:0;color:var(--muted);font-size:.9rem}
+.nav{display:flex;gap:4px}
+.nav button{border:0;background:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:7px;font-weight:600;font-size:.92rem;padding:8px 12px;border-radius:999px}
+.nav button svg{width:18px;height:18px;flex:none}
+.nav button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:860px){
+  .nav button{font-size:.66rem}
+  .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+       padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;gap:0}
+  .nav button{flex:1 1 0;flex-direction:column;gap:2px;font-size:.7rem;padding:6px 2px;border-radius:10px;min-width:0}
+  .nav button svg{width:22px;height:22px}
+  .nav button[aria-current="page"]{background:var(--soft);color:var(--accent)}
+}
+.view{display:grid;gap:18px;min-width:0}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.sec-head h2{font-size:1.45rem;font-stretch:108%}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;gap:16px;min-width:0}
 .panel h2{font-size:1.15rem;font-stretch:105%}
+.note{font-size:.86rem;color:var(--muted);margin:0}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.tabs button{border:0;background:none;color:var(--muted);font-weight:600;font-size:.9rem;padding:7px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.9rem;padding:9px 14px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+select,input[type=number],input[type=search]{width:100%;font:500 1rem var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+input[type=number]{font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.88rem;border-radius:999px;padding:3px 11px;width:max-content}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.t-Low{color:var(--r-low);background:var(--r-low-bg)} .t-Moderate{color:var(--r-mod);background:var(--r-mod-bg)}
+.t-High{color:var(--r-high);background:var(--r-high-bg)} .t-VeryHigh{color:var(--r-vhigh);background:var(--r-vhigh-bg)}
+
+/* forecast */
+.main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:22px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:12px;min-width:0}
 legend{font-family:var(--f-display);font-weight:700;font-size:.98rem;margin-bottom:6px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
 legend small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.85rem}
@@ -70,215 +107,472 @@ legend small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-s
 @media (max-width:520px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
 label.f,div.f{display:grid;gap:4px;font-size:.88rem;font-weight:600;min-width:0;align-content:start}
 .f span.hint{font-weight:400;color:var(--muted);font-size:.8rem}
-input[type=number],select{width:100%;font:500 1rem var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
-input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .seg{display:inline-flex;width:max-content;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
-.seg button{border:0;background:none;padding:8px 16px;font:600 .92rem var(--f-body);color:var(--muted);cursor:pointer}
+.seg button{border:0;background:none;padding:8px 16px;font-weight:600;font-size:.92rem;color:var(--muted);cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
 .q-row{display:flex;flex-wrap:wrap;gap:8px}
-.q-row button{flex:1 1 0;min-width:72px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 6px;cursor:pointer;color:var(--ink);font:600 .95rem var(--f-body);display:grid;justify-items:center;line-height:1.2}
+.q-row button{flex:1 1 0;min-width:72px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 6px;cursor:pointer;color:var(--ink);font-weight:600;font-size:.95rem;display:grid;justify-items:center;line-height:1.2}
 .q-row button small{font-weight:400;color:var(--muted);font-size:.75rem}
 .q-row button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
-.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:700 .92rem var(--f-body);padding:9px 14px;border-radius:8px;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--accent)}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.note{font-size:.85rem;color:var(--muted);margin:0}
 .warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 12px;font-size:.88rem;display:grid;gap:4px}
 .warn:empty{display:none}
-/* result */
 .result{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
 @media (max-width:860px){.result{position:static}}
 .reading{display:grid;gap:6px}
-.prob{font-family:var(--f-display);font-weight:800;font-stretch:118%;font-size:4.2rem;line-height:1;letter-spacing:-.02em}
+.prob{font-family:var(--f-display);font-weight:800;font-stretch:118%;font-size:4.2rem;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .prob small{font-size:1.6rem;font-weight:700}
-.pill{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.9rem;border-radius:999px;padding:4px 12px;width:max-content}
-.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
-.t-Low{color:var(--r-low);background:var(--r-low-bg)} .t-Moderate{color:var(--r-mod);background:var(--r-mod-bg)}
-.t-High{color:var(--r-high);background:var(--r-high-bg)} .t-VeryHigh{color:var(--r-vhigh);background:var(--r-vhigh-bg)}
 .scale{position:relative;height:14px;border-radius:7px;display:grid;grid-template-columns:30fr 20fr 20fr 30fr;overflow:hidden}
-.scale i{display:block} .scale i:nth-child(1){background:var(--r-low)} .scale i:nth-child(2){background:var(--r-mod)} .scale i:nth-child(3){background:var(--r-high)} .scale i:nth-child(4){background:var(--r-vhigh)}
+.scale i:nth-child(1){background:var(--r-low)} .scale i:nth-child(2){background:var(--r-mod)} .scale i:nth-child(3){background:var(--r-high)} .scale i:nth-child(4){background:var(--r-vhigh)}
 .scale-wrap{position:relative;padding-top:6px}
 .marker{position:absolute;top:0;width:3px;height:26px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .35s ease}
 @media (prefers-reduced-motion:reduce){.marker{transition:none}}
-.ticks{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);font-family:var(--f-mono);margin-top:4px}
-.ticks span{flex:1;text-align:left} .ticks span:last-child{text-align:right;flex:none}
+.ticks{position:relative;height:16px;font-size:.72rem;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.ticks span{position:absolute;transform:translateX(-50%)} .ticks span:first-child{transform:none} .ticks span:last-child{transform:translateX(-100%)}
 .action{border-left:3px solid var(--maize);padding:2px 0 2px 12px;margin:0}
-.drivers{display:grid;gap:7px;font-size:.88rem}
+.drivers{display:grid;gap:8px;font-size:.88rem}
 .drv{display:grid;grid-template-columns:minmax(0,1fr) 110px;align-items:center;gap:10px}
 .bar{position:relative;height:10px;background:var(--soft);border-radius:5px}
 .bar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--muted)}
 .bar b{position:absolute;top:0;height:10px;border-radius:5px}
 .bar b.up{left:50%;background:var(--r-high)} .bar b.down{right:50%;background:var(--r-low)}
 .meta{font-size:.8rem;color:var(--muted);display:grid;gap:2px}
-/* outlook */
-.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
-table{border-collapse:collapse;width:100%;min-width:520px;font-size:.92rem}
-th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
-th{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);position:sticky;top:0}
-td.num,th.num{text-align:right}
-tr:last-child td{border-bottom:0}
-tbody tr{cursor:pointer} tbody tr:hover{background:var(--soft)}
-.minibar{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-left:8px;background:currentColor;opacity:.75}
-.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
-.sec-head h2{font-size:1.4rem;font-stretch:108%}
+
+/* map */
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:20px;align-items:start}
+@media (max-width:860px){.mapgrid{grid-template-columns:minmax(0,1fr)}}
+.mapbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px;display:grid;justify-items:center;min-width:0}
+#map{width:100%;max-width:560px;height:auto;max-height:78vh;display:block}
+#map path{stroke:var(--mapline);stroke-width:.8;stroke-linejoin:round}
+#map path.mod{cursor:pointer}
+#map path.mod:hover{stroke:var(--ink);stroke-width:1.4}
+#map path.sel{stroke:var(--ink);stroke-width:2.4}
+#map path:focus{outline:none} #map path:focus-visible{stroke:var(--maize);stroke-width:2.4}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
+.card-h{display:grid;gap:4px}
+.card-h h3{font-size:1.35rem}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.92rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.big{font-family:var(--f-display);font-weight:800;font-stretch:115%;font-size:2.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.counts{display:grid;gap:8px}
+.counts div{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.92rem}
+
+/* rankings */
+.controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:min(100%,520px)}
+@media (max-width:520px){.controls{grid-template-columns:minmax(0,1fr)}}
+.tierbar{display:flex;height:16px;border-radius:8px;overflow:hidden;gap:2px}
+.tierbar i{display:block;min-width:4px}
+.tierkey{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.88rem}
+.tierkey span{display:inline-flex;align-items:center;gap:6px}
+.tierkey b{font-variant-numeric:tabular-nums}
+.tierkey i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.tgroup{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.tg-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:12px 16px;border-bottom:1px solid var(--line);border-left:5px solid currentColor}
+.tg-head h3{font-size:1.02rem;color:var(--ink)}
+.tg-head span{font-size:.85rem;color:var(--muted)}
+.rlist{list-style:none;margin:0;padding:0}
+.rlist li+li{border-top:1px solid var(--line)}
+.rlist button{width:100%;display:grid;grid-template-columns:2.2em minmax(0,1fr) minmax(60px,160px) 4.2em;align-items:center;gap:12px;padding:10px 16px;border:0;background:none;color:var(--ink);text-align:left;cursor:pointer;font-size:.95rem}
+.rlist button:hover{background:var(--soft)}
+.rk{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;font-size:.88rem}
+.nm{display:grid;line-height:1.25;min-width:0}
+.nm small{color:var(--muted);font-size:.8rem}
+.trk{height:6px;border-radius:3px;background:var(--soft);position:relative;overflow:hidden}
+.trk b{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:currentColor}
+.pc{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.rlist button{grid-template-columns:1.8em minmax(0,1fr) 4em;gap:10px;padding:10px 12px}.rlist .trk{display:none}}
+.more{width:100%;border:0;border-top:1px solid var(--line);background:var(--soft);color:var(--accent);font-weight:700;padding:10px;cursor:pointer;font-size:.9rem}
+.empty{padding:16px;color:var(--muted)}
+
+/* history */
+.stats4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.stats4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:grid;gap:2px;min-width:0}
+.stat b{font-family:var(--f-display);font-size:1.5rem;font-stretch:110%;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:.8rem;color:var(--muted)}
+.chartbox{min-width:0}
+#chart{display:block;width:100%}
+#chart text{font-family:var(--f-body);fill:var(--muted);font-size:11px}
+.readout{font-size:.9rem;min-height:1.5em}
+.hkey{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.84rem;color:var(--muted)}
+.hkey span{display:inline-flex;align-items:center;gap:6px}
+.season{display:grid;gap:8px}
+.season div{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4.5em;gap:10px;align-items:center;font-size:.9rem}
+.season .trk{height:10px;border-radius:5px;color:var(--r-high)}
+.season em{font-style:normal;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;font-size:.85rem}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:760px){.two{grid-template-columns:minmax(0,1fr)}}
+
+/* about */
 .about{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;font-size:.92rem}
 .about h3{font-size:1rem;margin-bottom:6px}
 .about p,.about ul{margin:0;color:var(--muted)} .about ul{padding-left:18px}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;margin:0}
-.stats dt{color:var(--muted);font-size:.82rem} .stats dd{margin:0;font-family:var(--f-mono);font-weight:600}
+.stats dt{color:var(--muted);font-size:.82rem} .stats dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+tr:last-child td{border-bottom:0}
+td.num{text-align:right;white-space:nowrap}
+.up-t{color:var(--r-high);font-weight:700} .down-t{color:var(--r-low);font-weight:700}
+.eq{font-family:var(--f-display);font-size:1.05rem;background:var(--soft);border-radius:8px;padding:10px 14px;overflow-x:auto;white-space:nowrap}
+/* farmer steps + guide */
+.todo{display:grid;gap:8px}
+.todo h3{font-size:1rem}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:st}
+.steps li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;align-items:start;font-size:.95rem;line-height:1.4;counter-increment:st}
+.steps li::before{content:counter(st);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.85rem;background:var(--soft);color:var(--ink)}
+.steps.tone li::before{background:var(--tc,var(--accent));color:#fff}
+.steps.tone li{color:inherit}
+.steps.tone li span{color:var(--ink)}
+details.office{border-top:1px solid var(--line);padding-top:10px}
+details.office summary{cursor:pointer;font-weight:600;font-size:.9rem;color:var(--muted)}
+details.office p{margin:8px 0 0;font-size:.9rem}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.level{background:var(--surface);border:1px solid var(--line);border-top:5px solid currentColor;border-radius:var(--radius);padding:16px;display:grid;gap:10px;align-content:start}
+.level h3{font-size:1.1rem;color:var(--ink)}
+.level .note{margin-top:-6px}
+.spot{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.spot > div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:start}
+.spot svg{width:48px;height:48px}
+.spot h4{margin:0 0 2px;font-family:var(--f-display);font-size:1rem}
+.spot p{margin:0;font-size:.9rem;color:var(--muted)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.ctl > div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:grid;gap:6px;align-content:start}
+.ctl h4{margin:0;font-family:var(--f-display);font-size:1rem}
+.ctl ul{margin:0;padding-left:18px;font-size:.92rem;display:grid;gap:4px}
+.callout{background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:14px 16px;display:grid;gap:4px;font-size:.95rem}
+.callout b{font-size:1rem}
+.src{font-size:.8rem;color:var(--muted)}
 footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
-.hidden-sm{display:inline} @media (max-width:520px){.hidden-sm{display:none}}
 </style>
 
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="10" fill="var(--accent)"/><path d="M22 9c-5 6-7 12-7 18a7 7 0 0 0 14 0c0-6-2-12-7-18z" fill="var(--maize)"/><path d="M22 13v24M18 19l4 3 4-3M17.5 25l4.5 3 4.5-3M18 31l4 3 4-3" stroke="var(--accent)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <svg width="42" height="42" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="10" fill="var(--accent)"/><path d="M22 9c-5 6-7 12-7 18a7 7 0 0 0 14 0c0-6-2-12-7-18z" fill="var(--maize)"/><path d="M22 13v24M18 19l4 3 4-3M17.5 25l4.5 3 4.5-3M18 31l4 3 4-3" stroke="var(--accent)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
       <div>
         <h1>FAWcast</h1>
         <p>Fall Armyworm outbreak risk for Philippine corn provinces</p>
       </div>
     </div>
-    <div class="tabs" role="group" aria-label="Forecast type">
-      <button type="button" id="modeQ" aria-pressed="true">Quarterly forecast</button>
-      <button type="button" id="modeM" aria-pressed="false">Monthly update</button>
-    </div>
+    <nav class="nav" aria-label="Sections">
+      <button type="button" data-view="forecast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>Forecast</button>
+      <button type="button" data-view="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Map</button>
+      <button type="button" data-view="guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z"/><path d="M12 6v14"/></svg>Guide</button>
+      <button type="button" data-view="rankings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h11M4 18h6"/></svg>Rankings</button>
+      <button type="button" data-view="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/></svg>History</button>
+      <button type="button" data-view="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>About</button>
+    </nav>
   </header>
 
-  <div class="main">
-    <form class="panel" id="form" autocomplete="off">
-      <div class="sec-head">
-        <h2 id="formTitle">Forecast the next quarter</h2>
-        <button type="button" class="btn ghost" id="fillLatest">Use latest data</button>
-      </div>
-      <p class="note" id="modeNote">Enter what happened in the province during the previous quarter. Every input is known before the forecast quarter begins.</p>
-
-      <fieldset>
-        <legend>Where and when</legend>
-        <label class="f" for="prov">Province
-          <select id="prov"></select>
-        </label>
-        <label class="f" for="regOther" id="regOtherWrap" hidden>Region of this province
-          <select id="regOther"></select>
-          <span class="hint">Provinces outside the 55 in the model use the region effect only (lower confidence).</span>
-        </label>
-        <div>
-          <div class="f" style="margin-bottom:4px;font-size:.88rem;font-weight:600" id="qLabel">Quarter to forecast</div>
-          <div class="q-row" role="group" aria-labelledby="qLabel">
-            <button type="button" data-q="1" id="q1">Q1<small>Jan–Mar</small></button>
-            <button type="button" data-q="2" id="q2">Q2<small>Apr–Jun</small></button>
-            <button type="button" data-q="3" id="q3">Q3<small>Jul–Sep</small></button>
-            <button type="button" data-q="4" id="q4">Q4<small>Oct–Dec</small></button>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Outbreak history <small>previous quarter, from BPI reports</small></legend>
-        <div class="grid2">
-          <div class="f">Outbreak in this province?
-            <span class="hint">Reports from 2 or more municipalities</span>
-            <div class="seg" role="group" aria-label="Outbreak in this province last quarter">
-              <button type="button" id="lagY1">Yes</button><button type="button" id="lagY0">No</button>
-            </div>
-          </div>
-          <div class="f">Outbreak in another province of the region?
-            <span class="hint">Any other province, same region</span>
-            <div class="seg" role="group" aria-label="Outbreak elsewhere in region last quarter">
-              <button type="button" id="nbR1">Yes</button><button type="button" id="nbR0">No</button>
-            </div>
-          </div>
-        </div>
-        <div class="grid2">
-          <label class="f" for="area">Corn area in BPI reports (ha)
-            <input type="number" id="area" min="0" step="0.1" inputmode="decimal">
-            <span class="hint">Total "Area Planted" in this province's reports</span>
-          </label>
-          <label class="f" for="nat">BPI reports nationwide
-            <input type="number" id="nat" min="0" step="1" inputmode="numeric">
-            <span class="hint">All Fall Armyworm reports in the Philippines</span>
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Weather <small>previous-quarter averages, NASA POWER</small></legend>
-        <div class="grid3">
-          <label class="f" for="tmin">Min. temperature (°C)<input type="number" id="tmin" step="0.01" inputmode="decimal"></label>
-          <label class="f" for="rain">Rainfall (mm/day)<input type="number" id="rain" min="0" step="0.01" inputmode="decimal"></label>
-          <label class="f" for="hum">Rel. humidity (%)<input type="number" id="hum" min="0" max="100" step="0.01" inputmode="decimal"></label>
-        </div>
-      </fieldset>
-
-      <fieldset id="monthBox" hidden>
-        <legend>First month of the quarter <small>BPI reports so far</small></legend>
-        <div class="grid3">
-          <label class="f" for="m1p">This province<input type="number" id="m1p" min="0" step="1" inputmode="numeric"></label>
-          <label class="f" for="m1r">Whole region<input type="number" id="m1r" min="0" step="1" inputmode="numeric"></label>
-          <label class="f" for="m1n">Nationwide<input type="number" id="m1n" min="0" step="1" inputmode="numeric"></label>
-        </div>
-      </fieldset>
-      <div class="warn" id="warn" role="status"></div>
-    </form>
-
-    <aside class="panel result" aria-live="polite">
-      <div class="reading">
-        <span class="eyebrow" id="resWhat">Outbreak probability</span>
-        <div class="prob num" id="prob">–</div>
-        <span class="pill" id="tier">–</span>
-      </div>
-      <div class="scale-wrap" aria-hidden="true">
-        <div class="scale"><i></i><i></i><i></i><i></i></div>
-        <div class="marker" id="marker" style="left:0%"></div>
-        <div class="ticks"><span>0</span><span>0.30</span><span>0.50</span><span>0.70</span><span>1.00</span></div>
-      </div>
-      <p class="action" id="action"></p>
-      <div>
-        <h3 style="font-size:.95rem;margin-bottom:8px">What moved the risk <span class="note hidden-sm">(compared with an average province-quarter)</span></h3>
-        <div class="drivers" id="drivers"></div>
-      </div>
-      <div class="meta" id="meta"></div>
-    </aside>
-  </div>
-
-  <section style="display:grid;gap:12px">
+  <!-- FORECAST -->
+  <section class="view" id="v-forecast">
     <div class="sec-head">
       <div>
-        <span class="eyebrow" id="outlookEyebrow">Outlook</span>
-        <h2 id="outlookTitle">Next-quarter outlook for all 55 provinces</h2>
+        <span class="eyebrow">Calculator</span>
+        <h2 id="formTitle">Forecast the next quarter</h2>
       </div>
-      <label class="f" for="regFilter" style="min-width:220px">Show region
-        <select id="regFilter"></select>
-      </label>
+      <div class="tabs" role="group" aria-label="Forecast type">
+        <button type="button" id="modeQ" aria-pressed="true">Quarterly</button>
+        <button type="button" id="modeM" aria-pressed="false">Monthly update</button>
+      </div>
     </div>
-    <p class="note" id="outlookNote"></p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>#</th><th>Province</th><th>Region</th><th>Last quarter</th><th class="num">Probability</th><th>Risk</th></tr></thead>
-        <tbody id="outlook"></tbody>
-      </table>
+    <div class="main">
+      <form class="panel" id="form" autocomplete="off">
+        <div class="row" style="justify-content:space-between">
+          <p class="note" id="modeNote" style="flex:1 1 260px"></p>
+          <button type="button" class="btn ghost" id="fillLatest">Use latest data</button>
+        </div>
+        <fieldset>
+          <legend>Where and when</legend>
+          <label class="f" for="prov">Province
+            <select id="prov"></select>
+          </label>
+          <label class="f" for="regOther" id="regOtherWrap" hidden>Region of this province
+            <select id="regOther"></select>
+            <span class="hint">Provinces outside the 55 in the model use the region effect only (lower confidence).</span>
+          </label>
+          <div>
+            <div class="f" style="margin-bottom:4px" id="qLabel">Quarter to forecast</div>
+            <div class="q-row" role="group" aria-labelledby="qLabel">
+              <button type="button" data-q="1" id="q1">Q1<small>Jan–Mar</small></button>
+              <button type="button" data-q="2" id="q2">Q2<small>Apr–Jun</small></button>
+              <button type="button" data-q="3" id="q3">Q3<small>Jul–Sep</small></button>
+              <button type="button" data-q="4" id="q4">Q4<small>Oct–Dec</small></button>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Outbreak history <small>previous quarter, from BPI reports</small></legend>
+          <div class="grid2">
+            <div class="f">Outbreak in this province?
+              <span class="hint">Reports from 2 or more municipalities</span>
+              <div class="seg" role="group" aria-label="Outbreak in this province last quarter">
+                <button type="button" id="lagY1">Yes</button><button type="button" id="lagY0">No</button>
+              </div>
+            </div>
+            <div class="f">Outbreak in another province of the region?
+              <span class="hint">Any other province, same region</span>
+              <div class="seg" role="group" aria-label="Outbreak elsewhere in region last quarter">
+                <button type="button" id="nbR1">Yes</button><button type="button" id="nbR0">No</button>
+              </div>
+            </div>
+          </div>
+          <div class="grid2">
+            <label class="f" for="area">Corn area in BPI reports (ha)
+              <input type="number" id="area" min="0" step="0.1" inputmode="decimal">
+              <span class="hint">Total "Area Planted" in this province's reports</span>
+            </label>
+            <label class="f" for="nat">BPI reports nationwide
+              <input type="number" id="nat" min="0" step="1" inputmode="numeric">
+              <span class="hint">All Fall Armyworm reports in the Philippines</span>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Weather <small>previous-quarter averages, NASA POWER</small></legend>
+          <div class="grid3">
+            <label class="f" for="tmin">Min. temperature (°C)<input type="number" id="tmin" step="0.01" inputmode="decimal"></label>
+            <label class="f" for="rain">Rainfall (mm/day)<input type="number" id="rain" min="0" step="0.01" inputmode="decimal"></label>
+            <label class="f" for="hum">Rel. humidity (%)<input type="number" id="hum" min="0" max="100" step="0.01" inputmode="decimal"></label>
+          </div>
+        </fieldset>
+        <fieldset id="monthBox" hidden>
+          <legend>First month of the quarter <small>BPI reports so far</small></legend>
+          <div class="grid3">
+            <label class="f" for="m1p">This province<input type="number" id="m1p" min="0" step="1" inputmode="numeric"></label>
+            <label class="f" for="m1r">Whole region<input type="number" id="m1r" min="0" step="1" inputmode="numeric"></label>
+            <label class="f" for="m1n">Nationwide<input type="number" id="m1n" min="0" step="1" inputmode="numeric"></label>
+          </div>
+        </fieldset>
+        <div class="warn" id="warn" role="status"></div>
+      </form>
+
+      <aside class="panel result" aria-live="polite">
+        <div class="reading">
+          <span class="eyebrow" id="resWhat">Outbreak probability</span>
+          <div class="prob" id="prob">–</div>
+          <span class="pill" id="tier">–</span>
+        </div>
+        <div class="scale-wrap" aria-hidden="true">
+          <div class="scale"><i></i><i></i><i></i><i></i></div>
+          <div class="marker" id="marker" style="left:0%"></div>
+          <div class="ticks"><span style="left:0">0%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:70%">70%</span><span style="left:100%">100%</span></div>
+        </div>
+        <div class="todo">
+          <h3>What farmers should do</h3>
+          <ol class="steps" id="farmSteps"></ol>
+          <button type="button" class="btn ghost" id="toGuide" style="justify-self:start;padding:6px 12px">How to check your field and control the worm</button>
+        </div>
+        <details class="office"><summary>For agriculture offices</summary><p id="action"></p></details>
+        <div>
+          <h3 style="font-size:.95rem;margin-bottom:8px">What moved the risk</h3>
+          <p class="note" style="margin-bottom:8px">Compared with an average province-quarter. Red raises the risk, green lowers it.</p>
+          <div class="drivers" id="drivers"></div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn ghost" id="toHistory">See this province's history</button>
+        </div>
+        <div class="meta" id="meta"></div>
+      </aside>
     </div>
   </section>
 
-  <section class="panel">
-    <h2>About this model</h2>
-    <div class="about">
+  <!-- MAP -->
+  <section class="view" id="v-map" hidden>
+    <div class="sec-head">
       <div>
-        <h3>How it works</h3>
-        <p>FAWcast is a hierarchical logistic regression trained on <span id="trainedOn"></span>. It turns ten inputs into a probability with P = 1 / (1 + e<sup>−z</sup>), and adds a baseline adjustment for each region and province.</p>
+        <span class="eyebrow" id="mapEyebrow">Map</span>
+        <h2 id="mapTitle">Risk map</h2>
       </div>
-      <div>
-        <h3>How well it predicts</h3>
-        <dl class="stats" id="stats"></dl>
+      <div class="tabs" role="group" aria-label="Map layer">
+        <button type="button" id="layerRisk" aria-pressed="true">Next-quarter risk</button>
+        <button type="button" id="layerPast" aria-pressed="false">Past outbreaks</button>
       </div>
+    </div>
+    <div class="legend" id="mapLegend"></div>
+    <div class="mapgrid">
+      <div class="mapbox"><svg id="map" role="group" aria-label="Map of Philippine provinces"></svg></div>
+      <aside class="panel" id="mapCard" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <!-- RANKINGS -->
+  <section class="view" id="v-rankings" hidden>
+    <div class="sec-head">
       <div>
-        <h3>Use with care</h3>
-        <ul>
-          <li>An outbreak means BPI reports from 2 or more municipalities. Quiet reporting can hide real infestations.</li>
-          <li>Sudden outbreaks in provinces with no recent reports are hard to forecast a quarter ahead. Run the monthly update after the first month.</li>
-          <li>This is a decision-support baseline. Confirm risk with field scouting.</li>
+        <span class="eyebrow" id="rankEyebrow">Rankings</span>
+        <h2 id="rankTitle">Next-quarter outlook</h2>
+      </div>
+      <div class="controls">
+        <label class="f" for="regFilter">Region<select id="regFilter"></select></label>
+        <label class="f" for="search">Find a province<input type="search" id="search" placeholder="Type a name"></label>
+      </div>
+    </div>
+    <div class="panel" style="gap:10px">
+      <div class="tierbar" id="tierBar" aria-hidden="true"></div>
+      <div class="tierkey" id="tierKey"></div>
+      <p class="note" id="rankNote"></p>
+    </div>
+    <div style="display:grid;gap:14px" id="rankList"></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view" id="v-history" hidden>
+    <div class="sec-head">
+      <div>
+        <span class="eyebrow" id="histEyebrow">History</span>
+        <h2 id="histTitle">Province history</h2>
+      </div>
+      <label class="f" for="histProv" style="width:min(100%,280px)">Province<select id="histProv"></select></label>
+    </div>
+    <div class="stats4" id="histStats"></div>
+    <div class="panel">
+      <div>
+        <h3 style="font-size:1.05rem">Each quarter: what happened and what the model estimated</h3>
+        <p class="note">Tap a quarter to see its numbers.</p>
+      </div>
+      <div class="hkey">
+        <span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--r-vhigh)"/></svg>Outbreak happened</span>
+        <span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.2" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.6"/></svg>No outbreak</span>
+        <span><svg width="22" height="12" aria-hidden="true"><path d="M1 6h20" stroke="var(--accent)" stroke-width="2.5"/></svg>Model estimate</span>
+        <span><svg width="12" height="12" aria-hidden="true"><rect x="2" y="1" width="8" height="10" rx="1.5" fill="var(--m-high)"/></svg>Municipalities reporting</span>
+      </div>
+      <div class="chartbox" id="chartBox"><svg id="chart" role="img"></svg></div>
+      <div class="readout" id="readout" aria-live="polite"></div>
+    </div>
+    <div class="two">
+      <div class="panel">
+        <h3 style="font-size:1.05rem">Riskiest season here</h3>
+        <div class="season" id="season"></div>
+        <p class="note">Share of quarters with an outbreak, by season, from the start of the data.</p>
+      </div>
+      <div class="panel">
+        <h3 style="font-size:1.05rem">How to read this</h3>
+        <ul class="note" style="padding-left:18px;display:grid;gap:6px">
+          <li>An outbreak means BPI reports from 2 or more municipalities in the quarter.</li>
+          <li>The green line is the model's estimate for each quarter, using the data known before it began.</li>
+          <li>When red dots sit high on the line and empty dots sit low, the model matched what happened.</li>
+          <li id="fitNote"></li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section class="view" id="v-guide" hidden>
+    <div class="sec-head"><div><span class="eyebrow">Farmer guide</span><h2>What to do about Fall Armyworm</h2></div></div>
+    <div class="callout"><b>Report it early.</b><span>If you see Fall Armyworm in your corn, tell your Municipal Agriculture Office (MAO) right away. They can check your field and give traps, natural enemies, or advice on spraying.</span></div>
+
+    <div style="display:grid;gap:10px">
+      <h3 style="font-size:1.15rem">1. What to do at each risk level</h3>
+      <p class="note">Find your province's risk on the Forecast, Map or Rankings page, then follow these steps.</p>
+      <div class="levels" id="levels"></div>
+    </div>
+
+    <div style="display:grid;gap:10px">
+      <h3 style="font-size:1.15rem">2. How to spot Fall Armyworm</h3>
+      <div class="spot">
+        <div><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 38c10-22 26-30 38-30-4 14-16 28-38 30z" fill="var(--r-low-bg)" stroke="var(--r-low)" stroke-width="2"/><g fill="var(--maize)" stroke="var(--warn-ink)" stroke-width=".6"><circle cx="24" cy="24" r="2.6"/><circle cx="29" cy="22" r="2.6"/><circle cx="26.5" cy="27" r="2.6"/><circle cx="31.5" cy="26.5" r="2.6"/><circle cx="21" cy="28.5" r="2.6"/></g></svg>
+          <div><h4>Eggs</h4><p>Small round eggs in clusters of 100 to 200, often covered with fuzzy hairs. Look under the leaves. They hatch in 2 to 3 days.</p></div></div>
+        <div><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="var(--r-mod-bg)" stroke="var(--muted)" stroke-width="1.5"><circle cx="9" cy="26" r="6"/><circle cx="18" cy="25" r="5.5"/><circle cx="26" cy="25" r="5.5"/><circle cx="34" cy="26" r="5.5"/><circle cx="41" cy="27" r="4.5"/></g><path d="M6 23l3 3 3-3M9 26v3" stroke="var(--maize)" stroke-width="1.6" fill="none" stroke-linecap="round"/><g fill="var(--ink)"><circle cx="37" cy="23" r="1.2"/><circle cx="40" cy="23.5" r="1.2"/><circle cx="37" cy="28" r="1.2"/><circle cx="40" cy="28.5" r="1.2"/></g></svg>
+          <div><h4>Worm (larva)</h4><p>A light-colored upside-down <b>Y</b> on the head, and <b>4 dark dots in a square</b> near the tail. Grows up to about 4 cm.</p></div></div>
+        <div><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4c-9 10-12 22-12 40h24c0-18-3-30-12-40z" fill="var(--r-low-bg)" stroke="var(--r-low)" stroke-width="2"/><g fill="var(--surface)" stroke="var(--r-high)" stroke-width="1.4"><path d="M20 18l4 2-2 4-3-2z"/><path d="M26 26l4 1-1 4-4-1z"/><path d="M18 31l3 1-1 3-3-1z"/></g><g fill="var(--r-high)"><circle cx="23" cy="38" r="1"/><circle cx="26" cy="40" r="1"/><circle cx="21" cy="41" r="1"/></g></svg>
+          <div><h4>Damage</h4><p>Papery "windows" and ragged holes on young leaves, and wet sawdust-like droppings inside the whorl. Worms also bore into ears.</p></div></div>
+        <div><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 14c-8-8-20-6-20 4s10 16 20 10c10 6 20 0 20-10s-12-12-20-4z" fill="var(--soft)" stroke="var(--muted)" stroke-width="2"/><path d="M24 14v20" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><path d="M24 14c-2-4-4-6-6-7M24 14c2-4 4-6 6-7" stroke="var(--muted)" stroke-width="1.4" fill="none"/></svg>
+          <div><h4>Moth (adult)</h4><p>Brownish-gray front wings and pale back wings. Flies at night and can travel far, which is why outbreaks spread between provinces.</p></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="font-size:1.15rem">3. How to check your field</h3>
+      <ol class="steps">
+        <li><span>Walk across your field in a zigzag (W) shape and stop at <b>5 places</b>.</span></li>
+        <li><span>At each stop, look closely at <b>10 corn plants</b>: the leaves, the whorl and the underside of leaves. That is 50 plants in total.</span></li>
+        <li><span>Count the plants with fresh damage, eggs or worms. Write the number down with the date.</span></li>
+        <li><span>Check young corn most carefully. Fall Armyworm attacks every stage, but young plants are hurt the most.</span></li>
+        <li><span>If the number of damaged plants keeps going up, or many plants have damage, tell your MAO.</span></li>
+      </ol>
+    </div>
+
+    <div style="display:grid;gap:10px">
+      <h3 style="font-size:1.15rem">4. Ways to control it</h3>
+      <div class="ctl">
+        <div><h4>Keep the field clean</h4><ul>
+          <li>Remove weeds in and around the field.</li>
+          <li>Plow and prepare the soil well. This kills the pupae in the soil.</li>
+          <li>Plant at the same time as your neighbors.</li>
+          <li>Rotate crops or plant other crops in between corn.</li></ul></div>
+        <div><h4>By hand</h4><ul>
+          <li>Crush egg clusters you find under leaves.</li>
+          <li>Pick off and kill worms in the whorl.</li>
+          <li>Pheromone traps catch moths and show when they arrive. Ask your MAO for traps and lures.</li></ul></div>
+        <div><h4>Natural enemies</h4><ul>
+          <li><b>Earwigs</b> eat the eggs and young worms.</li>
+          <li><b><i>Trichogramma</i></b> are tiny wasps that destroy the eggs.</li>
+          <li><b><i>Metarhizium</i></b> is a fungus that kills the worms.</li>
+          <li>These are available from the DA Regional Crop Protection Center through your MAO.</li></ul></div>
+        <div><h4>Spraying (only when needed)</h4><ul>
+          <li>Try botanical (plant-based) sprays first.</li>
+          <li>Use chemical sprays only when damage is high. Ask your MAO which one to use.</li>
+          <li>Use only approved products, and follow the label.</li>
+          <li>Spray into the whorl, where the worms hide.</li>
+          <li>Wear gloves, a mask and long sleeves. Keep children away.</li></ul></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="font-size:1.15rem">5. Who to contact</h3>
+      <ul class="note" style="padding-left:18px;display:grid;gap:4px;font-size:.95rem">
+        <li><b>Municipal Agriculture Office (MAO)</b>: your first stop for reports, traps, natural enemies and advice.</li>
+        <li><b>Provincial Agriculture Office (PAO)</b></li>
+        <li><b>DA Regional Crop Protection Center</b></li>
+        <li><b>Bureau of Plant Industry (BPI)</b></li>
+      </ul>
+    </div>
+    <p class="src">Based on the Department of Agriculture's Fall Armyworm leaflet (DA Caraga, “Pagmatikod ug Pagdumala sa Fall Armyworm”) and DA–BPI control measures. Always follow your local agriculture office's advice.</p>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="view" id="v-about" hidden>
+    <div class="sec-head"><div><span class="eyebrow">About</span><h2>How FAWcast works</h2></div></div>
+    <div class="panel">
+      <div class="about">
+        <div>
+          <h3>The model</h3>
+          <p>FAWcast is a hierarchical logistic regression trained on <span id="trainedOn"></span>. It adds up ten inputs into a score z, then turns z into a probability. Each region and province also gets its own baseline adjustment.</p>
+        </div>
+        <div>
+          <h3>How well it predicts</h3>
+          <dl class="stats" id="stats"></dl>
+        </div>
+        <div>
+          <h3>Use with care</h3>
+          <ul>
+            <li>Quiet reporting can hide real infestations.</li>
+            <li>Sudden outbreaks in provinces with no recent reports are hard to forecast a quarter ahead. Run the monthly update after the first month.</li>
+            <li>This is a decision-support baseline. Confirm risk with field scouting.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="eq">P(outbreak) = 1 / (1 + e<sup>−z</sup>), &nbsp; z = β<sub>0</sub> + β<sub>1</sub>x<sub>1</sub> + … + β<sub>10</sub>x<sub>10</sub> + region effect + province effect</div>
+    </div>
+    <div style="display:grid;gap:10px">
+      <h3 style="font-size:1.1rem">The ten inputs</h3>
+      <p class="note">“Odds change” shows how the odds of an outbreak change when the input goes up by one unit (or from No to Yes), with everything else the same.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Input</th><th>What it means</th><th>Effect</th><th class="num">Odds change</th></tr></thead>
+          <tbody id="varTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <h3 style="font-size:1rem">Risk levels: advice for agriculture offices</h3>
+      <div style="display:grid;gap:12px" id="tierGuide"></div>
     </div>
   </section>
 
@@ -289,20 +583,48 @@ footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);paddi
 </div>
 
 <script id="model-data" type="application/json">{"name":"FAWcast","version":"2026.10","trained_on":"BPI Fall Armyworm reports and NASA POWER weather, 55 provinces in 17 regions, Q3 2020 to Q4 2025 (1,210 province-quarters)","quarterly":{"coef":{"intercept":4.106713275952444,"tmin_l1":-0.12625205611852114,"rain_l1":0.0011985470010334829,"hum_l1":-0.058216570330416224,"Q2":-0.7557964960502767,"Q3":-0.1628058024057148,"Q4":-1.4638615464724192,"lagY":0.5548063733268389,"nbR":0.5244212034926815,"larea1":0.2150301557704499,"lnat1":0.37848048270233203},"u_region":{"BARMM":-0.3772133779903758,"CAR":0.0462081246472894,"I":-0.4421611448563258,"II":0.5586240436716755,"III":-0.4800481765438584,"IV-A":0.6281898400582413,"IV-B":-0.003805909417820774,"IX":-0.55383918907387,"NIR":0.021400645740181322,"V":0.1179620164218127,"VI":-0.4342414345969823,"VII":0.5113193248640584,"VIII":0.5537690072027743,"X":0.042164266525431295,"XI":0.04005667539478625,"XII":-0.5104197615237047,"XIII":0.2820350494766933},"u_province":{"Abra":0.4896554313248862,"Agusan del Norte":0.1703991989176909,"Agusan del Sur":0.4201083875534767,"Aklan":-0.14544922988836637,"Apayao":-0.1540976627688094,"Batangas":0.14527944045300575,"Biliran":-0.7527198136865103,"Bohol":-0.033136920222074207,"Bukidnon":0.5099224303300961,"Cagayan":0.20654079645075957,"Camarines Sur":0.36463105858012806,"Capiz":-0.3490936060008514,"Cavite":0.3171217399514382,"Cebu":0.6224876482435284,"Davao de Oro":0.09978676876264292,"Davao del Norte":0.06782545879407498,"Davao del Sur":0.10817476027687865,"Davao Oriental":-0.2296173446026998,"Ifugao":0.7948745433328445,"Ilocos Norte":-0.21557441198605812,"Iloilo":-0.005967301655168704,"Isabela":0.4006466366800093,"Kalinga":-0.1765339716607279,"Laguna":0.31913812507973516,"Lanao del Norte":-0.28992681020190075,"Leyte":0.9816472832163318,"Maguindanao del Norte":-0.37286199506652684,"Maguindanao del Sur":-0.06191715003456049,"Marinduque":-0.25642915883384093,"Masbate":-0.2286670985331323,"Misamis Occidental":-0.1935512670278475,"Misamis Oriental":0.022154516460979726,"Mountain Province":-0.9006384875742277,"Negros Occidental":-0.5552916048444091,"Negros Oriental":0.579958159644501,"North Cotabato":-0.2212955117087544,"Nueva Vizcaya":-0.09979006450526749,"Oriental Mindoro":0.14317724500385046,"Palawan":-0.021254994369090004,"Pampanga":-0.08706389776220906,"Pangasinan":-0.2940640467073553,"Quezon":0.39809874174423987,"Quirino":0.13647715521675924,"Rizal":-0.4555814321719947,"Romblon":0.13012018667868155,"Samar":-0.22521526688289603,"Sarangani":-0.7099514243971933,"South Cotabato":0.2316568300779239,"Southern Leyte":0.6345663674764336,"Sultan Kudarat":0.11127622188036597,"Surigao del Sur":-0.2654317411941521,"Tarlac":-0.46624345553743807,"Zamboanga del Norte":-0.15857184885701253,"Zamboanga del Sur":-0.15083521759815216,"Zamboanga Sibugay":-0.3289523958520287},"performance":{"cv_auc":0.824,"new_province_auc":0.799,"new_year_auc":0.785,"forward_auc":0.773,"cv_accuracy":0.798}},"monthly":{"coef":{"intercept":-8.394209897745998,"tmin_l1":-0.015443281673488584,"rain_l1":0.020200257985110152,"hum_l1":0.06978601515930741,"Q2":0.32228666258504,"Q3":-0.6138403580219082,"Q4":-0.7770865047049667,"lagY":0.23603323349377542,"nbR":0.36424260400193453,"larea1":0.24482309408807781,"lnat1":-0.2974076893268457,"m1p":0.399912056230594,"m1r":0.256755205189667,"m1n":0.41661212941289383},"u_region":{"BARMM":-0.29194803314386863,"CAR":-0.2693116341858633,"I":-0.22973245209307652,"II":0.29530126859574185,"III":0.09835285216933917,"IV-A":0.3179226876282297,"IV-B":-0.057200826155893475,"IX":-0.35198787609578697,"NIR":0.20099424744175798,"V":0.0665654873291614,"VI":-0.3676423802245567,"VII":0.39493983137698657,"VIII":0.3268279327344582,"X":-0.13030880172650128,"XI":0.17052772093259777,"XII":-0.2163817243991162,"XIII":0.04308169981639126},"u_province":{"Abra":0.32334366662040936,"Agusan del Norte":-0.010563451374363786,"Agusan del Sur":0.26463269521791644,"Aklan":-0.3771889519417842,"Apayao":-0.3514472776292141,"Batangas":0.0233055082465001,"Biliran":-0.3806809885708222,"Bohol":0.06317396360660907,"Bukidnon":0.28101146552744316,"Cagayan":0.030073742190768398,"Camarines Sur":0.16943196290418724,"Capiz":-0.1881616068573818,"Cavite":0.40284031628433215,"Cebu":0.6208281381369835,"Davao de Oro":0.11029470859313611,"Davao del Norte":0.1648100342879824,"Davao del Sur":0.1557169902490908,"Davao Oriental":-0.13548226555418907,"Ifugao":0.7535142168790142,"Ilocos Norte":-0.4210363657550066,"Iloilo":-0.07137468587127573,"Isabela":0.4622562364499674,"Kalinga":-0.5073941791755084,"Laguna":0.5717780878971355,"Lanao del Norte":-0.40045190713776224,"Leyte":0.5449007546578212,"Maguindanao del Norte":-0.36023020604573397,"Maguindanao del Sur":-0.14539888579357316,"Marinduque":-0.28479299608340486,"Masbate":-0.05414621652103332,"Misamis Occidental":-0.13972042128322307,"Misamis Oriental":0.03347713292927713,"Mountain Province":-0.6844412062994152,"Negros Occidental":-0.28659957031962374,"Negros Oriental":0.6347044631819081,"North Cotabato":-0.22137094444430513,"Nueva Vizcaya":-0.07198720286531442,"Oriental Mindoro":-0.1084038480500209,"Palawan":0.1086947768681742,"Pampanga":0.21841088461548175,"Pangasinan":0.02315935364786455,"Quezon":0.07942853451360292,"Quirino":0.09109383385393746,"Rizal":-0.5267374690309066,"Romblon":0.18543511527996467,"Samar":0.025890564772059293,"Sarangani":-0.43481783200250707,"South Cotabato":-0.045630564819543085,"Southern Leyte":0.37592777200703364,"Sultan Kudarat":0.3270646507813088,"Surigao del Sur":-0.17945541439425142,"Tarlac":-0.0480721336170048,"Zamboanga del Norte":-0.1379282770931175,"Zamboanga del Sur":-0.19926059854579362,"Zamboanga Sibugay":-0.2724241031238375},"performance":{"cv_auc":0.844,"new_province_auc":0.831,"new_year_auc":0.807,"forward_auc":0.798}},"province_region":{"Abra":"CAR","Agusan del Norte":"XIII","Agusan del Sur":"XIII","Aklan":"VI","Apayao":"CAR","Batangas":"IV-A","Biliran":"VIII","Bohol":"VII","Bukidnon":"X","Cagayan":"II","Camarines Sur":"V","Capiz":"VI","Cavite":"IV-A","Cebu":"VII","Davao de Oro":"XI","Davao del Norte":"XI","Davao del Sur":"XI","Davao Oriental":"XI","Ifugao":"CAR","Ilocos Norte":"I","Iloilo":"VI","Isabela":"II","Kalinga":"CAR","Laguna":"IV-A","Lanao del Norte":"X","Leyte":"VIII","Maguindanao del Norte":"BARMM","Maguindanao del Sur":"BARMM","Marinduque":"IV-B","Masbate":"V","Misamis Occidental":"X","Misamis Oriental":"X","Mountain Province":"CAR","Negros Occidental":"NIR","Negros Oriental":"NIR","North Cotabato":"XII","Nueva Vizcaya":"II","Oriental Mindoro":"IV-B","Palawan":"IV-B","Pampanga":"III","Pangasinan":"I","Quezon":"IV-A","Quirino":"II","Rizal":"IV-A","Romblon":"IV-B","Samar":"VIII","Sarangani":"XII","South Cotabato":"XII","Southern Leyte":"VIII","Sultan Kudarat":"XII","Surigao del Sur":"XIII","Tarlac":"III","Zamboanga del Norte":"IX","Zamboanga del Sur":"IX","Zamboanga Sibugay":"IX"},"ranges":{"tmin":[13.089999999999998,27.820000000000004],"rain":[0.2933333333333333,50.09],"hum":[64.26333333333334,93.28333333333336],"area":[0,19933.900000000012],"national":[48.99999999999999,2498.9999999999995],"m1p":[0,434.00000000000006],"m1r":[0,693.9999999999999],"m1n":[12.999999999999996,1407.9999999999995]},"tiers":[{"max":0.3,"name":"Low","action":"Continue routine field monitoring and standard pest management. Teach farmers to recognise and report Fall Armyworm."},{"max":0.5,"name":"Moderate","action":"Increase field inspections, set up pheromone traps for early detection, and prepare control materials with the local agriculture office."},{"max":0.7,"name":"High","action":"Start close monitoring in affected areas and apply integrated pest management promptly once infestation is confirmed."},{"max":1.01,"name":"Very High","action":"Issue an outbreak advisory, intensify surveillance in nearby farms, and coordinate rapid intervention with agricultural authorities."}],"latest":{"based_on":"2025 Q4","forecast_for":"2026 Q1","national_reports":424,"provinces":{"Abra":{"tmin":21.03,"rain":6.72,"hum":83.88,"lagY":1,"nbR":1,"area":43.5},"Agusan del Norte":{"tmin":21.87,"rain":11.54,"hum":88.86,"lagY":0,"nbR":0,"area":0.0},"Agusan del Sur":{"tmin":21.71,"rain":8.4,"hum":86.95,"lagY":0,"nbR":0,"area":0.5},"Aklan":{"tmin":24.41,"rain":11.63,"hum":89.07,"lagY":0,"nbR":0,"area":0.0},"Apayao":{"tmin":19.85,"rain":7.87,"hum":91.74,"lagY":1,"nbR":1,"area":35.0},"Batangas":{"tmin":22.91,"rain":14.15,"hum":90.66,"lagY":0,"nbR":1,"area":1.0},"Biliran":{"tmin":26.01,"rain":9.55,"hum":84.89,"lagY":0,"nbR":1,"area":0.0},"Bohol":{"tmin":25.45,"rain":9.23,"hum":86.39,"lagY":0,"nbR":0,"area":0.0},"Bukidnon":{"tmin":17.38,"rain":6.18,"hum":89.95,"lagY":1,"nbR":0,"area":18.7},"Cagayan":{"tmin":22.19,"rain":8.95,"hum":89.17,"lagY":1,"nbR":1,"area":31.6},"Camarines Sur":{"tmin":24.85,"rain":15.44,"hum":85.88,"lagY":0,"nbR":0,"area":0.0},"Capiz":{"tmin":24.41,"rain":11.63,"hum":89.07,"lagY":0,"nbR":0,"area":0.0},"Cavite":{"tmin":25.24,"rain":9.34,"hum":85.81,"lagY":0,"nbR":1,"area":0.0},"Cebu":{"tmin":25.43,"rain":9.2,"hum":86.9,"lagY":0,"nbR":0,"area":2.0},"Davao de Oro":{"tmin":21.26,"rain":5.98,"hum":88.61,"lagY":1,"nbR":1,"area":9.3},"Davao del Norte":{"tmin":21.86,"rain":5.93,"hum":85.84,"lagY":1,"nbR":1,"area":5.5},"Davao del Sur":{"tmin":25.11,"rain":4.4,"hum":79.63,"lagY":0,"nbR":1,"area":3.0},"Davao Oriental":{"tmin":25.0,"rain":4.27,"hum":82.45,"lagY":0,"nbR":1,"area":0.0},"Ifugao":{"tmin":17.84,"rain":10.08,"hum":92.12,"lagY":1,"nbR":1,"area":34.8},"Ilocos Norte":{"tmin":22.41,"rain":6.24,"hum":84.55,"lagY":0,"nbR":0,"area":0.0},"Iloilo":{"tmin":24.98,"rain":11.34,"hum":88.34,"lagY":0,"nbR":0,"area":0.0},"Isabela":{"tmin":21.08,"rain":12.25,"hum":90.11,"lagY":1,"nbR":1,"area":1014.0},"Kalinga":{"tmin":18.72,"rain":8.33,"hum":92.16,"lagY":0,"nbR":1,"area":7.5},"Laguna":{"tmin":22.91,"rain":14.15,"hum":90.66,"lagY":0,"nbR":1,"area":0.0},"Lanao del Norte":{"tmin":22.76,"rain":9.75,"hum":87.91,"lagY":0,"nbR":1,"area":2.7},"Leyte":{"tmin":25.19,"rain":13.9,"hum":87.44,"lagY":1,"nbR":0,"area":5.5},"Maguindanao del Norte":{"tmin":19.54,"rain":8.86,"hum":86.79,"lagY":0,"nbR":1,"area":0.0},"Maguindanao del Sur":{"tmin":21.15,"rain":6.76,"hum":85.97,"lagY":1,"nbR":0,"area":124.9},"Marinduque":{"tmin":25.7,"rain":11.64,"hum":86.52,"lagY":0,"nbR":0,"area":0.0},"Masbate":{"tmin":25.97,"rain":12.21,"hum":87.08,"lagY":0,"nbR":0,"area":0.0},"Misamis Occidental":{"tmin":25.36,"rain":9.62,"hum":85.03,"lagY":0,"nbR":1,"area":0.0},"Misamis Oriental":{"tmin":20.28,"rain":7.66,"hum":87.34,"lagY":0,"nbR":1,"area":0.0},"Mountain Province":{"tmin":17.84,"rain":10.08,"hum":92.12,"lagY":0,"nbR":1,"area":0.0},"Negros Occidental":{"tmin":23.62,"rain":9.9,"hum":88.44,"lagY":0,"nbR":1,"area":0.0},"Negros Oriental":{"tmin":24.17,"rain":8.39,"hum":86.18,"lagY":1,"nbR":0,"area":0.8},"North Cotabato":{"tmin":19.68,"rain":5.12,"hum":88.22,"lagY":0,"nbR":0,"area":0.0},"Nueva Vizcaya":{"tmin":17.63,"rain":11.87,"hum":91.81,"lagY":1,"nbR":1,"area":272.0},"Oriental Mindoro":{"tmin":22.45,"rain":8.57,"hum":90.74,"lagY":0,"nbR":0,"area":0.0},"Palawan":{"tmin":26.18,"rain":8.5,"hum":83.98,"lagY":0,"nbR":0,"area":0.0},"Pampanga":{"tmin":21.5,"rain":6.68,"hum":89.35,"lagY":0,"nbR":0,"area":0.0},"Pangasinan":{"tmin":21.23,"rain":7.87,"hum":85.06,"lagY":0,"nbR":0,"area":0.0},"Quezon":{"tmin":25.48,"rain":14.87,"hum":88.72,"lagY":0,"nbR":1,"area":0.0},"Quirino":{"tmin":20.82,"rain":12.89,"hum":90.41,"lagY":1,"nbR":1,"area":156.0},"Rizal":{"tmin":22.51,"rain":14.29,"hum":90.1,"lagY":1,"nbR":0,"area":8.4},"Romblon":{"tmin":26.77,"rain":9.15,"hum":83.5,"lagY":0,"nbR":0,"area":0.0},"Samar":{"tmin":24.74,"rain":13.67,"hum":87.51,"lagY":0,"nbR":1,"area":0.0},"Sarangani":{"tmin":22.56,"rain":3.67,"hum":84.91,"lagY":0,"nbR":0,"area":0.0},"South Cotabato":{"tmin":21.62,"rain":3.7,"hum":85.8,"lagY":0,"nbR":0,"area":0.0},"Southern Leyte":{"tmin":26.69,"rain":12.65,"hum":84.05,"lagY":0,"nbR":1,"area":0.0},"Sultan Kudarat":{"tmin":19.09,"rain":4.44,"hum":89.58,"lagY":0,"nbR":0,"area":0.0},"Surigao del Sur":{"tmin":24.64,"rain":11.55,"hum":86.38,"lagY":0,"nbR":0,"area":5.0},"Tarlac":{"tmin":21.29,"rain":7.35,"hum":88.12,"lagY":0,"nbR":0,"area":0.0},"Zamboanga del Norte":{"tmin":25.01,"rain":9.31,"hum":85.95,"lagY":0,"nbR":0,"area":0.0},"Zamboanga del Sur":{"tmin":21.82,"rain":9.82,"hum":90.93,"lagY":0,"nbR":0,"area":0.0},"Zamboanga Sibugay":{"tmin":25.28,"rain":8.19,"hum":82.71,"lagY":0,"nbR":0,"area":0.0}}},"national_reports_by_quarter":{"2020 Q1":1182,"2020 Q2":1482,"2020 Q3":1390,"2020 Q4":1246,"2021 Q1":576,"2021 Q2":499,"2021 Q3":687,"2021 Q4":252,"2022 Q1":357,"2022 Q2":323,"2022 Q3":144,"2022 Q4":54,"2023 Q1":65,"2023 Q2":49,"2023 Q3":64,"2023 Q4":50,"2024 Q1":247,"2024 Q2":692,"2024 Q3":2499,"2024 Q4":515,"2025 Q1":744,"2025 Q2":654,"2025 Q3":1184,"2025 Q4":424},"means":{"tmin_l1":22.466606060606058,"rain_l1":7.9267079889807155,"hum_l1":83.93374655647384,"lagY":0.30991735537190085,"nbR":0.45289256198347105,"larea1":1.4108830060914863,"lnat1":5.884594921842271,"m1p":0.533875092175424,"m1r":1.2059303427996368,"m1n":4.683272057164248,"Q2":0.22727272727272727,"Q3":0.2727272727272727,"Q4":0.2727272727272727},"region_names":{"CAR":"Cordillera Administrative Region","I":"Region I (Ilocos)","II":"Region II (Cagayan Valley)","III":"Region III (Central Luzon)","IV-A":"Region IV-A (CALABARZON)","IV-B":"Region IV-B (MIMAROPA)","V":"Region V (Bicol)","VI":"Region VI (Western Visayas)","NIR":"Negros Island Region","VII":"Region VII (Central Visayas)","VIII":"Region VIII (Eastern Visayas)","IX":"Region IX (Zamboanga Peninsula)","X":"Region X (Northern Mindanao)","XI":"Region XI (Davao)","XII":"Region XII (SOCCSKSARGEN)","XIII":"Region XIII (Caraga)","BARMM":"BARMM"}}</script>
+<script id="app-data" type="application/json">{"map":{"w":592,"h":1002,"provinces":[{"n":"Ilocos Norte","m":1,"d":"M215.1 204.8L212.5 199.3L206.7 197L210.7 192.4L209.2 186.8L211.6 183.9L212.3 179.7L216.5 172.2L216.4 167.3L214.6 162.5L218.2 159.3L222.8 160.3L226.2 159.6L227.7 157.8L227.5 154.7L231.2 152.9L234.7 158.1L238.8 157.9L235.3 174.9L238.4 181.1L236 186.7L235.9 190.8L237 192.5L234.9 195L230.4 194.4L227.5 197.3L224.3 198.4L222.1 201.9L215.1 204.8Z","c":[224.9,178.9]},{"n":"Ilocos Sur","m":0,"d":"M215.1 204.8L210.8 214.5L209 222.4L216.1 222.5L213.1 230.6L214.3 233.3L217.4 233.9L221.3 236.6L221 240.4L222.1 241.6L225.6 242.7L228.7 241.7L229.2 242.6L227 245.5L226.6 248L227.6 256.7L220.3 257.5L217.3 261.6L215.9 261.8L216.7 267.7L214.7 271.8L212.8 269L213.9 267L213.5 264.4L212.2 264.1L212.9 263L211.3 261.4L211.8 257L206.9 258L205.7 256.7L207.6 253.6L208 250.6L205.3 239.3L207.1 234.9L206.6 231.8L208.1 230.7L208.6 227.5L206.1 221.1L204.6 221.3L201.7 217.9L203.3 211.7L202.3 210.7L203.6 211L207.1 208L205.4 206.5L206.6 205.6L205.2 204.2L208.4 202.5L207.6 197.8L212.5 199.3L215.1 204.8Z","c":[212.7,234.7]},{"n":"La Union","m":0,"d":"M214.7 271.8L211.9 276.3L211.6 279L209.6 280.2L209.1 286.5L207.6 288.8L210.7 291.3L211.9 297L211.3 299.4L206.6 299.9L204.9 296.8L202.9 295.6L204 297.6L203.6 297.6L201.6 294.2L201.7 291.3L200.4 289L200.9 283.8L199.4 281.9L200.3 277.5L197.9 274.9L199.8 275.1L199.6 273.3L201.3 271.2L201.2 261.8L205 259.2L205.7 256.7L206.9 258L211.8 257L211.3 261.4L212.9 263L212.2 264.1L213.5 264.4L213.9 267L212.8 269L214.7 271.8Z","c":[206.0,278.3]},{"n":"Pangasinan","m":1,"d":"M206 299.7L211.3 299.6L212.1 298L218.5 301.2L226.6 300.1L230.9 301.9L235.5 314L229.6 324.4L225.4 320.9L217.6 323.1L216.2 320.3L213.9 326.2L209 328.7L206.6 326.8L203.8 327.1L200 333.1L197.4 333.5L196.4 334.9L190.9 325.8L190.1 322.5L186.1 322L183.7 319.6L182.6 319.8L180.5 323.5L174.7 323.2L176.6 321.6L173.7 314.7L171.1 314.4L170.2 316.7L168.9 316.1L168.2 317L166.9 314.2L168.4 310.6L167.3 309L168.8 304L167.1 301.8L168.9 297.7L168.7 293.5L170.8 290.5L173.1 290.6L174.7 288.4L176.3 289.3L177.2 289L177.5 290L176.5 293.8L176.8 297.1L179.1 298.8L180.2 298.3L179.9 299.3L182.3 301.8L184.1 300.3L184.1 300.7L184.1 300.6L184.1 300.7L183.9 300.8L183.7 300.9L183.6 301L186.7 301.9L188.1 303.3L186.7 303.2L187.8 304.5L186.8 305L187.1 306.3L188.3 307.3L187.3 308.1L189.9 309.7L195.1 309.8L200.9 308.3L206.2 302.6L206 299.7ZM181 291L182.9 293.2L181.5 295.3L182.7 297.5L181.4 298.8L178.6 296L178.9 295.3L176.8 294.1L181 291ZM176.4 288.4L176.5 286.7L177.8 286.4L179.4 287.8L179.5 289.7L176.4 288.4Z","c":[201.1,311.6]},{"n":"Bukidnon","m":1,"d":"M476.3 756.6L489.8 756.7L489 763.3L491.3 766.7L490.6 770.7L493.9 774.2L495.9 780.8L500.5 786.3L498.2 787.4L496.4 791.1L499.1 797.4L498.9 802.8L500.3 807.7L499.3 814.6L492.1 813.8L493.6 818.1L490 818.1L489.9 821.6L487.9 822.5L484.1 821.4L483.6 824.1L478.4 824.9L477.2 827.7L472.9 827.9L470.4 825.9L468.3 827.1L465.1 824.6L463.8 822.1L462.1 823L464.4 819.2L464 816.6L462.9 814.3L460.2 812.7L458.7 807.3L450.9 797.8L448 788.1L445.1 783.4L448.6 783.2L449.9 781.1L449 778.3L450 774.4L451.5 773.7L452.1 766.7L462.3 766.5L462.5 761.6L464.9 760.9L465.6 759.9L464.4 758.3L465.5 758.5L466.3 756.7L475.9 755.4L476.3 756.6Z","c":[472.6,791.7]},{"n":"Camiguin","m":0,"d":"M456.8 716.6L461.5 719.8L463.1 724.9L461.3 727.2L455.4 724.8L453.1 721.8L453.6 718L456.8 716.6Z","c":[457.7,721.9]},{"n":"Lanao del Norte","m":1,"d":"M449.1 782.4L448.3 783.3L445.1 783.4L444.1 782.2L441.4 784.3L437.5 782.6L437.6 784.8L435.7 785.9L435.3 787.6L432.5 788.8L428.4 787.7L427.3 790.7L422.3 790.2L421.9 794.1L415.2 795.9L416 797.2L413.9 799.2L417.6 802.7L415.6 804.9L416 807.4L413.5 808.5L408.3 807.7L407.2 807.9L407.1 810.1L402.7 809.8L402.1 808.1L400.4 808L399.6 804.5L393.9 802.2L394.4 799.9L396.4 798.7L395.3 798.5L396.2 796.7L394.5 796L395.4 794.4L396.9 794.9L398 793.3L401 792.4L407 785.3L410 785.1L411.9 782.8L416.7 780.3L424.9 780.9L428.9 779.3L431.4 775.3L430.4 772.1L433.7 773.3L435.1 772.3L437.4 773.1L442.9 772.4L446.4 781.7L449.1 782.4Z","c":[412.0,791.1]},{"n":"Misamis Occidental","m":1,"d":"M398.6 788.9L394.4 790.5L394.7 790.4L394.6 790L390.1 790.1L389.8 755L390.5 757.7L392.7 752.9L391.3 752.4L393 751.8L394.3 754L397.6 753.5L400.6 756.7L400.4 755.3L401.6 756L400.9 757.4L405.2 763.5L407.9 772.5L406.9 775.8L408 782.5L403.6 786L401.8 789L398.6 788.9Z","c":[398.7,771.5]},{"n":"Misamis Oriental","m":1,"d":"M484.5 757.1L476.3 756.6L475.9 755.4L466.3 756.7L465.5 758.5L464.4 758.3L465.6 759.9L464.9 760.9L462.5 761.6L462.3 766.5L452.2 766.7L451.5 773.7L450 774.4L449 778.3L449.9 781.1L449.1 782.4L446.4 781.7L442.9 772.4L437.4 773.1L435.1 772.3L433.7 773.3L430.3 772.1L432.5 768.2L432.5 764.2L434.4 759.5L442.2 754.6L443.9 754.8L443.5 756.5L447.7 759.6L449.4 759.5L449.7 760.9L454.7 761.6L454.9 763L456.9 763.7L459.4 762.3L459.4 758.5L461.1 756.3L459.3 750.5L461.4 748.9L460.6 746.3L462.1 742.5L461.5 733.4L467.2 731L469 733.1L475.9 736.9L479.1 742.3L484.1 741.3L485.5 736.4L484.5 731.4L485.4 727.4L486.6 726.4L488.4 732.7L487.2 733.1L488.1 735L487.2 736.9L489.9 741.5L488.6 741.6L488.5 752.4L484.5 757.1Z","c":[473.4,754.4]},{"n":"Davao del Norte","m":1,"d":"M516.2 858.1L514.5 857.2L513.6 855.1L514.4 854.3L516.7 855.8L516.2 858.1ZM519.2 858.4L516.8 854.1L516.2 847.9L514.3 848.2L513.4 846.4L516 840.1L521.2 845L519.9 850.1L520.9 855.7L519.2 858.4ZM513.2 792.1L513.5 801.5L516.9 803.1L517.2 806.5L519.5 808.4L520.2 811.3L521.5 811.5L524.3 807.3L527 806.3L526.9 807.3L529.4 807.5L527.4 810.5L529.5 813.1L529 816.2L527.2 815.8L526.8 820.1L523.7 820.8L526.5 822.7L523.3 824.3L523.5 830.3L521.9 830L518 832.5L515.3 834.4L514.2 836.7L513 835.1L510.8 836.4L509.8 838.6L506.6 838.8L506.3 818.1L493.6 818.1L492.1 813.8L499.3 814.6L500.3 807.5L498.9 802.8L498.8 795.7L496.7 791.8L513.2 792.1Z","c":[511.2,815.2]},{"n":"Davao del Sur","m":1,"d":"M513.5 836.5L514.2 836.9L512.4 837.6L513.4 843.5L512.5 846.2L508.2 850.5L507.2 849.2L505.2 850.3L503 853.3L502.8 857.3L496.7 863.7L497.5 864.4L496.3 868.6L496.8 875L500.9 877.9L501.1 879.1L498.9 880.3L499.9 881.3L498.3 883.2L494.7 879.6L494.4 882.4L492.5 884.7L489 885.9L487.4 884.1L480.8 885.8L480.2 882.1L482.7 880.8L479.9 878L477.2 871.9L478.7 866.4L477.5 866L477.6 864.6L479.5 864.4L479.1 861.6L483.7 860.6L486.6 857.1L489.7 850.2L491.6 849.8L491.4 845.1L487.9 841.4L487.6 839.3L489.4 836.4L487.9 830.6L490.6 829.5L488.2 827.8L487.6 823.7L488 821.9L489.9 821.6L490 818.1L506.3 818.1L506.6 838.8L509.8 838.6L510.8 836.4L513 835.1L513.5 836.5Z","c":[496.5,852.1]},{"n":"Davao Oriental","m":1,"d":"M529.8 847.5L530.5 846.2L545.2 838.5L549.4 839L550.5 840.5L550.1 821.5L548.2 815.2L550.9 815.7L545.2 804L541.7 793.7L542.3 792.6L545 793.3L546.4 792L553.7 791.9L554.1 798.9L555.5 800L555.5 802.2L559.2 803.4L562.7 807.8L566.5 808.9L565.3 810.3L565.4 813.8L566.9 815.4L565.8 817.3L567.1 817.9L568.2 822.8L567.9 825.1L565.8 825.2L565.2 826.3L565.5 827.9L566.9 828.3L565.6 829.6L566.4 832.4L565.3 833.2L566.2 834.7L568.5 834.7L565.9 839.9L564.3 839.6L563.3 844.5L560.4 846.8L560.8 848.1L559.6 848.6L559.2 851L559.9 852.3L552.9 851.7L551.1 855.6L549.6 856.3L553.3 860.5L553.6 863.8L549.9 862.7L550.7 860.3L548.9 856.3L548.4 857.3L545.1 854.8L543.8 856L544.1 859.2L542.1 857.6L548.3 866.9L546 873.8L546.3 885.9L544.6 888.6L544.4 895.8L544 891.7L541 888.7L541.9 886.8L538 880.1L538.5 876.1L537.1 872.9L538.5 871.1L538.8 867.8L537.5 866.3L537.8 861.3L534.4 859.5L531.7 856.3L532.5 851.2L529.8 847.5Z","c":[549.2,843.9]},{"n":"Davao de Oro","m":1,"d":"M542.3 792.6L541.7 793.7L545.2 804L550.9 815.7L548.2 815.2L550.1 821.5L550.5 840.5L549.4 839L545.2 838.5L530.5 846.2L529.8 847.6L526.4 844.7L526.8 842L523.6 837L524.6 831.1L523.2 829.9L523.9 827.6L523 826.2L523.7 823.8L526.5 822.8L523.7 820.8L526.8 820.1L527.2 815.8L529 816.2L529.5 813.1L527.4 810.5L529.4 807.5L526.9 807.3L527 806.3L524.3 807.3L521.9 811.1L520.2 811.3L519.5 808.4L517.2 806.5L516.9 803.1L513.5 801.5L513.2 792.1L518.6 792.1L519.9 794.9L524.4 794L527.3 796.1L527.9 792L531.9 792.1L533.1 794.9L535.3 796.1L539.7 793.1L542.3 792.6Z","c":[538.1,819.9]},{"n":"Davao Occidental","m":0,"d":"M494 948.8L496.9 945.9L499.6 946.8L499.1 950.1L495.1 949.9L494 948.8ZM501.4 945.7L502.2 944.7L501.1 944.1L502.7 944.1L501.9 943.2L502.5 942.3L503.8 943.9L502.1 948.6L501.4 945.7ZM499.7 881.5L498.9 880.3L501.1 879L500.8 876.4L499.2 874.7L499.6 874L501.6 876.3L502.9 876.1L502.6 877.5L504.9 878.7L505.2 881L506.8 879.9L508.6 881.1L507.4 881.7L508 882.3L509.3 881.9L508.6 884.2L508.6 885.7L510.7 887.4L515.7 899.2L516.4 905.8L513.2 916.8L504.5 927.1L498.7 937.6L493.9 938.7L493.1 937.9L493.6 936.2L497.6 933L502.8 921.7L502.7 917.5L506 907.8L504.2 903L504 898.2L502.2 894.2L500.8 892.7L499.4 892.8L498 883.4L499.7 881.5Z","c":[510.9,906.3]},{"n":"North Cotabato","m":1,"d":"M448.7 850.9L449.1 848.9L451.9 849.8L451.6 852.3L449.6 852.4L448.7 850.9ZM443.5 846.4L441.2 846.6L442 845.4L443.5 846.4ZM474.9 866.5L474.9 868L473.5 868.4L471.3 866.6L471.7 864.9L464.5 864.5L464.1 863.1L463 863L464.4 860.3L463 859.1L463 857.3L463 855.1L464.2 855.1L464.2 848.2L461.1 847.4L461.7 844.1L462.6 844.4L461.2 842.6L462.1 842L461.9 839.9L459.6 839L458.5 841.4L457.6 841L458 836.8L455 837.9L457.2 839.7L454.9 840.4L455.7 842.9L458.7 844L459 845.2L455.5 843.9L455 844.9L454.8 846L456.9 847.3L455.1 846.8L454.8 848.2L457.1 848.9L457.9 850.8L456.5 851.3L455.2 849.1L455 849.9L452.5 849.1L452.5 848.2L453.8 848.2L452.6 846.3L452.9 844.5L451.7 847.3L450.4 847.2L448.8 844.7L448.8 847L450.1 848.1L446.3 850.1L447.4 846.1L446.5 846L446.3 843.7L443.1 841.7L444.6 839.6L441.9 837.8L439.8 838.8L440.2 837.9L437.4 837.9L439.1 830.7L442.1 830.1L442.4 826.6L444.3 825.7L446.8 813.7L450.5 815.4L459.4 816.5L462.6 820.1L462.1 823L463.8 822.1L465.1 824.6L468.3 827.1L470.4 825.9L472.9 827.9L477.1 827.8L478.4 824.9L483.6 824.1L484.1 821.4L487.9 822.5L488 827.3L490.6 829.5L487.9 830.6L489.4 836.4L487.6 839.3L487.9 841.4L491.4 845.1L491.6 849.8L489.7 850.2L486.6 857.1L483.7 860.6L479.1 861.6L479.5 864.4L474.9 866.5Z","c":[476.8,841.0]},{"n":"South Cotabato","m":1,"d":"M480.7 878.8L482.7 880.8L480.2 882.1L481.1 885.9L478.9 890.4L481.8 890.3L484.1 891.6L485.7 894.4L490.3 897.4L488.3 900.7L488.5 906.1L483.9 906L480.6 914.7L477.8 914.3L477.8 909.6L474.8 909.6L474.8 911.4L465.5 911.2L439.7 899.5L439.7 892.4L438.1 892.4L438.6 891.4L442.8 890.9L447.1 888.7L449.7 890.6L452.9 888L455.9 888.7L456.1 887.5L453.1 885.9L452.1 884.1L451.8 878L453.6 876.6L454.7 877.9L458 877.1L457.2 874.4L458.4 871.9L460.2 872.9L461 876.5L465.2 879.6L469.6 877.4L474.6 879.9L480.1 880L480.7 878.8Z","c":[462.4,893.2]},{"n":"Sultan Kudarat","m":1,"d":"M474.9 869.3L474.9 866.5L477.5 865.7L478.7 866.4L477.2 871.9L480.7 878.8L480.1 880L474.6 879.9L469.6 877.4L465.2 879.6L461 876.5L460.2 872.9L458.4 871.9L457.2 874.4L458 877.1L454.7 877.9L453.6 876.6L451.8 878L452.1 884.1L453.1 885.9L456.1 887.5L455.9 888.7L452.9 888L449.7 890.6L447.1 888.7L442.8 890.9L438.6 891.4L438.1 892.4L439.7 892.4L439.7 899.8L437.3 905.1L434.7 905.1L426.7 899.4L425.7 895.7L422.2 892.9L420.4 888.6L419.2 889.4L418 886.6L418.2 882.9L417.1 880.2L419.6 879.3L418 878.8L419.1 875.8L416.9 869.1L417.8 867.5L429.3 868L430.4 866.6L432.5 866.8L432.2 870.2L440.1 868.3L446.1 868.3L445.7 865.6L449.8 865L449.9 861L451.2 861L450.9 860.1L453 858.7L455.1 860.1L456.6 864.4L457.9 863.3L462.5 871L460.5 872.1L462 873L461.9 875.8L466.6 875.4L466.8 873.4L468.7 872.6L467.8 871.3L474.9 869.3Z","c":[434.6,881.9]},{"n":"Sarangani","m":1,"d":"M480.5 914.7L478.7 920.6L470 920.4L451.2 912.8L449.7 911.1L446.4 910.7L438.2 905.9L437.4 903.6L439.7 899.5L440.9 899.8L465.5 911.2L474.8 911.4L474.8 909.6L477.8 909.6L477.8 914.3L480.5 914.7ZM488.4 906.2L488.3 900.7L490.3 897.2L485.7 894.5L484.1 891.6L481.8 890.3L478.9 890.4L481.1 885.9L487.4 884.1L489 885.9L492.5 884.7L494.4 882.4L494.8 879.6L498.3 883.2L499.4 892.8L500.8 892.7L502.2 894.2L504 898.2L504.2 903L506 907.8L502.7 917.5L502.8 921.7L497.6 933L493.9 935.6L493.1 937.9L491.7 937L492.6 934.1L491.2 930.4L488.4 928.9L487.2 925.9L485.2 925.6L484.7 924.1L485 921.7L486.4 922.4L487.4 920.4L487.1 918.8L490.4 916.9L491.6 913.1L490.4 907L488.4 906.2Z","c":[454.5,910.2]},{"n":"NCR, City of Manila, First District (Not a Province)","m":0,"d":"M239.7 393.8L241.7 396.5L239.4 398.5L238 396.4L238 396.6L237.6 397.3L237.5 396.5L238.2 396.2L236.9 396.3L236.2 395.8L237.9 395.9L237.8 394.2L236.7 393.9L239.7 393.8Z","c":[239.3,396.0]},{"n":"NCR, Second District (Not a Province)","m":0,"d":"M246.2 400.1L241.2 397.2L241.7 396.3L239.7 393.6L241.8 388L248 385.3L246.4 391.5L248.1 392.7L246.1 394.8L246.2 400.1Z","c":[244.1,392.7]},{"n":"NCR, Third District (Not a Province)","m":0,"d":"M246 386.1L241 388.9L241.6 390.4L239.8 393.8L239.3 393.6L238.9 393.9L237.7 394L237.2 393.8L234.7 390L235.4 389.2L237 390.7L235.9 387.8L239.2 388.5L239.5 386.6L241.6 386.2L242 384.9L246 386.1Z","c":[238.9,389.4]},{"n":"NCR, Fourth District (Not a Province)","m":0,"d":"M246.2 400.1L243.8 402.7L243.5 409.3L240.6 410.8L240.6 408.5L238.2 404.1L239.6 401.8L238.7 401.5L239 398.3L241.2 397.2L246.2 400.1Z","c":[240.8,404.1]},{"n":"Abra","m":1,"d":"M246.7 210.9L245.4 211.7L245.4 215.2L247 216.8L246.6 218.8L244.3 219.1L239.8 222.8L239.7 228L236.5 233.1L234.9 239.2L233.8 240.6L227.6 242.5L222.1 241.6L221.3 236.6L217.4 233.9L214.8 233.6L213.1 231.4L216.1 222.5L209 222.3L210.8 214.5L215.2 204.6L222.1 201.9L224.3 198.4L227.5 197.3L230.4 194.4L234.9 195L236.1 193.6L239.3 195.5L240.8 201.3L245 201.8L246.7 210.9Z","c":[228.4,218.4]},{"n":"Benguet","m":0,"d":"M227.6 256.7L228.2 258L231.4 258.1L231.8 261.5L233.9 262.7L234 270.4L236 276L234.6 276.3L233.8 278.5L233.7 285.8L232 290.8L231.1 292.8L228.5 293.7L226.6 300.1L218.4 301.2L211.6 298.1L210.6 291.1L207.6 288.8L209.1 286.5L209 281.8L211.6 279L211.9 276.3L216.7 267.7L215.9 261.8L217.3 261.6L220.3 257.5L227.6 256.7Z","c":[222.8,278.8]},{"n":"Ifugao","m":1,"d":"M273.4 247.3L273.5 257.4L270.7 261.7L260 264.7L260.4 265.9L256.9 272.6L256.4 271.9L251.7 273.7L244.4 274.3L239.2 277.8L236.7 276.9L234 270.4L233.9 263.1L239.2 252.9L248.7 251.3L254.5 251.6L262 247.6L273.4 247.3Z","c":[250.1,262.6]},{"n":"Kalinga","m":1,"d":"M271.5 235.8L268.6 234.4L264 234.9L259.4 238.1L257.3 237.3L255.4 238.4L253.4 241L249.5 241.8L246.1 240.8L244.2 238.2L235 237.1L239.7 228L239.8 222.8L244.3 219.1L246.6 218.8L247 216.8L245.4 215.2L245.4 211.7L246.7 210.9L252.9 213.8L255.8 211L257.5 211.2L257.7 212.6L261.9 213.5L265.7 210.4L265.9 212L268.1 211.9L269.3 216.5L275.3 219.1L276.1 218.4L278.1 222L277 226.9L275.7 226.7L274.3 230.8L271.7 233L271.5 235.8Z","c":[258.5,226.4]},{"n":"Mountain Province","m":1,"d":"M271.5 235.8L273.4 247.3L262 247.6L254.5 251.6L248.7 251.3L239.8 252.7L233.9 262.7L231.8 261.5L231.4 258.1L228.2 258L227.6 256.7L227 245.5L229.2 242.6L228.7 241.7L233.8 240.6L235 237.1L244.2 238.2L246.1 240.8L249.5 241.8L253.4 241L255.4 238.4L257.3 237.3L259.4 238.1L264 234.9L268.6 234.4L271.5 235.8Z","c":[243.0,249.0]},{"n":"Apayao","m":1,"d":"M265.7 210.4L261.9 213.5L257.7 212.6L256.8 211L253.7 213.8L247.2 211.5L245 201.8L240.8 201.3L239.3 195.5L236.1 193.6L237.1 192.2L235.9 190.8L236 186.7L238.4 181.1L235.3 174.9L237.1 166.8L237.7 164.2L240.3 164L243.8 159.6L245.6 159.5L245.4 162.3L247.1 159.4L250.1 159.7L250 160.7L253.2 162L253.4 165.8L256.9 168.7L268.3 173.6L267.4 174.9L268.8 177.7L268.6 182.5L267.1 184.6L267.1 189L265.2 189.9L261.5 188.3L258.6 193.8L261.1 196.7L258.4 203.4L262.9 204.4L265.7 210.4Z","c":[251.8,186.2]},{"n":"Agusan del Norte","m":1,"d":"M518 708.8L519.4 722.2L518.4 726.8L515.2 732.9L515.5 734.9L513.3 735.7L511.6 738.6L513.7 749.9L504.7 750.1L502.3 749.5L501.2 747.6L491 747.6L488.5 748.8L488.6 741.6L489.9 741.5L487.2 736.9L488.1 735L487.2 733.1L488.4 732.7L486.7 726.4L488.4 730.2L491 732.5L493.9 732.6L493.6 733.5L494 733.8L494.6 732.6L499.6 733.5L505.2 731.3L504.4 730.3L505.9 727.3L504.9 723.5L505.6 720.4L501 705.6L503 704.8L505.3 712.5L505.1 711.1L507.3 708.6L506.4 707.7L506.9 704.1L516.6 706.9L518 708.8Z","c":[512.0,727.2]},{"n":"Agusan del Sur","m":1,"d":"M548.5 788.4L545 793.3L541.4 792.3L535.3 796.1L533.1 794.9L531.9 792.1L527.9 792L527.3 796.1L524.4 794L519.9 794.9L518.6 792.1L496.7 791.8L496.7 789.4L497.5 789.4L498.2 787.4L500 786.9L500.4 786.2L495.9 780.8L493.9 774.2L490.6 770.7L491.3 766.7L489 763.3L489.8 756.7L489.4 757.2L488.9 757.1L484.5 757.1L484.4 757L488.5 752.4L488.5 748.8L490.3 747.7L501.2 747.6L502.3 749.5L504.7 750.1L513.7 749.9L511.6 738.6L513.3 735.7L515.5 734.9L515.2 732.9L518.1 727.7L519.4 722.2L518.8 718.2L525.2 726.4L526.3 729.2L527.1 739.8L530.1 743.2L531.3 747.6L535.1 754L533.1 756L533.1 757.7L534.7 757.9L535 759.6L534 762L537.4 765.3L536.8 766.3L537.8 767.6L539.7 768.6L540.4 772.6L544.8 774.7L542.7 776.4L543.8 777.3L542.1 778.6L547 784.1L546.9 788.5L548.5 788.4Z","c":[511.4,757.2]},{"n":"Surigao del Norte","m":0,"d":"M524.9 699.9L526 703.9L518.3 712.4L516.9 707.2L506.9 704.1L508 701.6L506.3 700.3L503.1 699.8L502.2 701.1L503.2 704.6L501 705.6L497.4 692.6L498 686L500.2 684.5L500 682.6L503.6 684.4L504.1 686L505.8 685.6L507.2 687L508.1 686.3L507.6 687.4L508.1 688L510.7 686.9L510.2 689.4L509.1 690L510.1 694L512.8 695.9L517.8 696.5L517.8 698L519.3 698.8L524.9 699.9ZM512.8 692.1L511.7 689.3L511.5 689.8L510.6 689.7L511.2 688.4L513.4 688.7L512.8 692.1ZM511.4 684.6L512.4 684.4L513.6 686L513.6 686.5L513.4 686.8L511.4 684.6ZM515.3 684.4L516.4 683.2L516.5 684.7L517.9 685.1L517 686.8L515.5 686.1L515.3 684.4ZM509.3 683.7L509.5 682.1L508.5 682.8L508.4 681.7L512.1 677L512.2 680.3L514.8 681.1L509.3 683.7ZM510.3 677.3L510.4 678.6L509.4 678.6L508.3 680.8L508.7 678.3L507.6 679.2L507.3 678.3L510.3 677.3ZM507 680.1L504.4 678.8L504.3 677.3L504.6 676.7L507 680.1ZM532.3 691.1L531.3 696.9L529.1 698.3L527.8 695.1L527.7 695.4L526.5 695.3L527.3 694.1L527.6 694.3L527.6 694.7L527.7 694.7L527.6 692.8L528.8 692.7L528.7 689.8L527.6 688.8L528.4 688.4L528.1 686.6L529.9 686.6L529.5 688.1L530.9 687.3L530.7 690.7L532.3 691.1ZM534.8 688L537.2 688.3L537.2 689.4L535 689.1L533.4 691L534.8 688ZM532.1 687.8L533.6 689.8L532.1 690.8L531.1 689.2L532.1 687.8ZM531.1 680.2L528.6 679.9L530.4 678.5L531.1 680.2ZM536.8 668.2L539.8 676.9L540.1 679.4L538.4 681.1L541.4 681.3L541.7 683.6L542.9 683.4L542.3 685.3L539.7 687.1L534.6 685.9L535 687.3L531.6 682.4L530.1 681.9L531.6 680.6L530.7 679.2L531.7 677.8L531.5 676.6L536.8 668.2ZM528.3 679.6L527.6 678.6L531.6 675.6L531.1 674.6L531.2 674.2L532 675.4L531.3 676.5L531.5 676.9L529.7 678.7L528.8 678.2L528.3 679.6Z","c":[508.2,697.5]},{"n":"Surigao del Sur","m":1,"d":"M546.4 792L548.5 788.4L546.9 788.5L547 784.1L542.1 778.6L543.8 777.3L542.7 776.4L544.8 774.7L540.4 772.6L539.7 768.6L537.8 767.6L536.8 766.3L537.4 765.3L534 762L535 759.6L534.7 757.9L533.1 757.7L533.1 756L535.1 754L531.3 747.6L530.1 743.2L527.1 739.8L526.3 729.2L525.2 726.4L518.8 718.2L518 712.9L526 703.9L526.3 702.2L528.2 702.2L529.8 705.3L529.5 703.5L530.9 703.2L530.4 705.5L528.5 705.4L526.8 707.2L529.7 709.8L532.3 707.8L531.4 710.1L532.1 712.7L536.4 718L540.7 716.2L543 713.4L545.2 713.6L542.3 725.7L543.6 727.3L544.6 726.6L547 730.9L546.2 730.9L551 734.6L550.2 736.5L552.1 736.9L551 739.1L552.7 741.6L551.5 741.7L552.2 742.5L550.7 743.7L550.8 745.1L547.9 745.6L545.5 748.1L545.5 749.4L547.4 750.3L544.1 750L538.8 753.2L537.9 755.3L540.4 757L539.6 758L541.4 760.2L542.7 759.5L546.4 760.4L544.1 759.2L545.2 758.5L549.9 760.3L552.8 760.2L553.8 759.1L553.6 760.8L555.9 761.3L556.3 763.9L553.8 763.8L553.4 766.3L555 766.1L555.3 767.4L553.9 769.9L551.7 770.8L552.8 771.9L552.4 773.2L555.5 774.5L551.1 778.9L553.2 781L559.8 777.3L558 785.3L559.6 786.1L557.2 788.9L557.8 791L556.9 791.4L557.4 793L558.3 792.4L559.4 792.7L555.7 794.8L554.6 796.9L553.6 796L553.7 791.9L546.4 792Z","c":[539.0,749.4]},{"n":"Dinagat Islands","m":0,"d":"M503.1 665L503.7 661L505.3 661L503.7 659.4L505.3 660.6L506.3 659.8L504.5 657.5L505.9 655.2L504.8 654.9L504.6 652.7L507.2 652.8L506.8 648.9L508.5 650.5L509.5 650L510.4 645.5L512.3 643.8L514.4 648.5L512.4 653.6L512.2 657.4L513.3 659.8L512.2 660.9L512.8 662.1L514.1 661.9L513.2 664.8L515.4 668.4L513.8 672.4L514.3 674.3L512.9 675.1L515.8 677.9L515.5 680.1L513.2 680.9L512 678.7L512.2 675.9L509.1 674.7L510.6 674.4L509.1 673.3L510 672.4L508.3 673.4L507.3 672.5L508.5 672.1L508.2 669.4L509.9 669.4L508.6 666.9L507.6 666.9L508.3 668.1L506.6 666.9L505.3 668.3L503.9 667.9L502.2 663.9L502.5 663.6L502.7 664.9L503.1 665ZM503.9 645.3L502.4 646.4L501.8 644.4L503.9 645.3Z","c":[508.9,662.3]},{"n":"Marinduque","m":1,"d":"M300.2 480.1L297.7 479.5L295.8 477L290.9 474.9L288.2 471.3L287.7 464.8L291.4 459.6L290.6 460.1L290.3 459.6L290.8 457.8L294 460.5L294.7 459.3L296.7 460.3L296.7 459.3L297.1 458.5L296.8 460.3L298.7 460.7L299.3 459L300.7 460.2L300.1 461.2L301.4 461.1L301.8 461.6L302.1 462.9L301.1 462.9L303.2 463.5L303.8 462.6L306.2 464.7L304.7 466.7L307.6 469.7L301.5 475.4L301.8 477.6L300.2 480.1Z","c":[297.7,468.9]},{"n":"Occidental Mindoro","m":0,"d":"M241.8 540.9L240.8 540L241.3 539.6L240.2 538.9L241 537.9L242.4 539.8L241.4 540L241.8 540.9ZM244.7 534.5L248.1 542.4L245.3 541.6L244.8 539.5L242.4 538.5L242.7 534.6L244.7 534.5ZM233.4 462L233.6 466.7L228.5 475.2L247.1 485.7L254.3 488.1L255.5 510.3L253.6 527.3L254.4 539.5L251.4 537.3L246.6 537.4L246.8 535.9L245.6 534.7L246.8 534L247.1 531.8L246.4 532.6L245.3 531.1L245.5 532.3L245.1 532.3L242.5 530.3L235.8 521.8L236 515.1L231.7 509L227.8 507.9L227.5 502.7L226.1 501.6L227.4 500L227.5 496.1L224.6 488.2L219.9 480.7L215.1 478.3L212.2 478.6L212.3 476.1L209.7 474.2L208.6 467L207.2 466.4L204.5 467.4L204 469.5L201.8 469.1L199.1 465.3L201.8 461.7L205.8 460.1L209.6 461.8L214.4 461.5L225.4 464.1L233.4 462ZM206.3 454.4L204.3 454L203.9 453.4L200.9 452.2L200.1 451.8L199.4 451.1L205.7 452.7L206.3 454.4ZM197.3 451.8L196.5 449.9L187.4 444.9L187.1 441.9L186.1 441.1L186.8 440.2L189.7 440.7L193.6 443.4L194.6 442.7L195.4 444.5L196.5 444.4L198.5 447.9L196.3 448.9L198.8 449.6L198.9 450.9L197.3 451.8ZM199.5 442.1L201.3 443.6L199.9 445.6L196.8 443.3L199.5 442.1ZM184.2 440L182.7 438.9L183 438.2L184.8 438.9L184.2 440Z","c":[241.0,499.8]},{"n":"Oriental Mindoro","m":1,"d":"M254.4 539.5L253.6 527.3L255.5 510.3L254.3 488.1L247.1 485.7L228.5 475.2L233.6 466.7L233.4 462L236.9 461.8L237 460.7L237.5 461.8L238.2 460.4L239.8 460.7L237.6 461.9L238.7 463.9L243.6 467.7L246.2 466.9L248.5 467.7L251.9 465.8L253.4 468.7L258 471.4L262.4 477.6L266 478.3L266.1 483.4L270 482.9L272.8 484.8L272.8 486.7L268.7 490.7L269.1 501L268 505.4L271.7 510.2L272.8 515.7L270.6 517L269.9 519.2L265.8 521.1L266.2 523.4L264.2 525.3L264.3 528.2L266.7 530.4L262.7 530.2L263.4 534.8L262 535.1L262.5 534.1L260.4 532.4L259.7 534.3L256.3 534.9L254.4 539.5Z","c":[261.6,500.0]},{"n":"Palawan","m":1,"d":"M7 803.8L5.6 803.4L5.9 800.9L4.8 800.8L1.7 795.8L3.9 794.9L2.9 792.1L3.9 788.8L4.1 791.1L6.1 789.4L5.7 788.2L9.7 787.2L10.5 791.7L8.9 792.8L10.3 792.5L10.9 797.6L9.9 798.1L10.5 799.2L9.4 801.5L7.5 803.2L6.8 802.6L7 803.8ZM7.1 787.7L5.3 786.1L7.9 784.2L9.5 786.9L7.1 787.7ZM17.8 782.2L14.6 782.9L13.6 781.3L16.9 781.2L17.8 782.2ZM13.4 778.9L10.8 779L10.6 777.1L12.7 777.6L13.4 778.9ZM22.7 780.8L21.3 779.4L21.5 774.1L22.2 772.6L23.2 773.1L24.1 772.2L26.5 774.6L26.2 779.4L22.7 780.8ZM16.2 776.7L15.4 774.8L17.2 774.6L19.3 771.7L18.9 773.1L21 773.2L20.9 774.7L19.3 776L16.2 776.7ZM89.4 719.5L89.8 717.3L90.3 717.1L91.2 718.8L89.4 719.5ZM17.1 772.2L16 770.8L18.4 766.2L18.6 760.7L20 759.5L19.8 757.9L21.4 757.2L20.8 755.5L21.9 756L23.2 752.6L25.4 751.6L26.1 750.1L24.9 750.4L24.8 750.3L26.9 747.3L30.7 746.5L30.4 744.9L32.6 743.3L34.6 738.7L37.9 734.6L39.7 734.5L42.3 732L42.7 729.1L46.2 726.7L47.5 728.4L49.6 727.9L51.3 722.1L53.4 720.1L56.4 719.5L58.9 716.3L61.7 717L63.4 715.2L63.5 717.3L65.5 717.4L69.5 712L71.9 711.4L71.9 708.1L75.2 707.5L76 703.7L83.7 697.1L84.4 693.1L88.2 692.2L89 689.7L94.4 686.4L97.8 681.1L99.9 679.7L99.9 677.1L102.2 676L103.3 673.5L102.2 671.8L106.8 669.9L109 664.1L109.8 667.8L107.9 667.5L109.8 668.4L109.9 670.7L111.8 670.3L111.9 667.8L113.7 665.6L111.6 664.7L111.6 660.5L119.4 659.6L120.2 656.9L119.3 656.2L120.8 655.8L119.1 654.6L120.9 655L121.3 653.4L122.9 653.5L123.4 651.4L124.2 651.8L124.6 651.7L123.9 649.4L121.6 651.2L121 649.7L122 649.4L122.2 647.6L124.4 647L126.8 648.7L127.5 647.4L126.7 646.6L129.2 646L127.3 644.9L127.9 643.2L129.7 642.9L129.6 647.3L131.4 649.1L135.6 643.1L138 643L138.8 641.2L136.5 639.1L138.5 639.8L141.6 636.7L143.1 628.1L141.6 625.8L139.1 626.1L138.2 621.9L135.2 621.1L137.4 620.5L136.1 619.3L138.2 618.9L137.1 617.5L135.5 617.7L136.6 616L135.6 615.6L135.9 614.7L137.2 615L137.3 617.4L138.6 615.2L139.7 615.8L139.1 616.5L140.2 617.3L139.3 618.5L140.5 618.5L138.6 619.8L141.1 619.7L139.6 621.1L141.3 622.3L141.6 621.2L142.5 623.4L143.9 622.7L143.3 624.1L145.9 624.6L146.1 626.6L147.3 626L148.2 628.9L150.1 628.5L148.4 624L148.3 622.1L149.8 622.1L149.4 621L148.7 621.6L147.2 619.7L144.8 620.5L143.4 619.7L143.7 618.7L142.6 618.4L144.2 615.8L141.2 615.4L142.5 615L141.3 614.8L140.8 611.6L141.8 609.9L143.3 612.6L144.5 611.5L142.3 609.8L143.2 608.7L142 608.5L142.1 605.6L143.8 606.7L143.3 607.6L144.7 609.3L146.4 610.1L147.5 609.8L148.1 603.8L147.8 603.2L147.9 603L147.8 603L146.5 604L145 600.9L145.9 601.1L147.7 598.4L147 593.3L148.3 591.3L149.5 592L150.7 590.2L150.9 586.5L152.5 587L152.9 592.1L154.5 592.7L155.5 591.6L156.3 594.4L154.5 601.5L152.3 604L154.4 607.9L155.9 606.9L155.3 608.3L156.4 611.6L152.4 611.5L151.4 619.6L154.3 623.3L156.7 621.7L158.1 622.7L156.9 623.3L157.9 624.1L156.8 625L157.9 625.7L157.4 627.3L158.2 628.4L156.4 632.1L158.8 632.3L160.3 630.5L161.5 631.5L161 632.1L161.9 632.1L162.1 632.6L159.5 632.4L160.5 633.9L159.6 634.7L161.4 635.5L162.2 639.3L164.2 639.5L163.6 640.4L164.5 640.1L165 641.6L157.4 646.7L156.4 649.6L152.9 650.4L149.7 649.5L141.9 653.3L136.6 661.1L135.8 667.4L134.6 669.1L122.1 672.8L115.2 673.4L112.6 675.7L109.7 675.6L109.2 677.2L108.8 676.1L108.3 676.3L107.9 681.5L109.7 683.6L109.7 688.3L107.3 688.2L106.7 684.7L104.9 686.5L105.1 689.3L107.1 689.5L105.9 690.6L105.7 691.2L107.3 690L107.5 691.2L109 690.7L109 692L106.7 692.5L107.3 693.8L103 698.6L101.8 701.7L100.9 701.5L101.3 703.3L100.5 702.7L97.9 705.6L93.1 714.3L91.8 713.9L89.6 715.3L89.1 717.3L87.7 717.4L84.8 721.2L81.8 721L77.4 722.6L76.7 721.8L73.2 723.9L71.9 723.1L70.4 728.9L68.4 729.1L69.2 731.1L67.9 731.4L68.3 732.3L64.5 739.2L57.7 742.4L49.3 750.8L42.2 752.6L39 751.6L37.2 753.4L37.8 756.5L35.2 761.9L34.4 762.4L32.6 760.7L32.4 762L32 762.4L31.1 761.5L31.2 762.4L27.7 762.4L27.4 763.5L21.1 767.6L19.8 769.9L18 770.3L18.7 771L17.1 772.2ZM130.2 639L130.9 637.8L130 637.4L130.5 636.6L132.4 636.4L132.4 637.7L133.2 637.1L134.7 638L132 637.8L130.2 639ZM140.6 614.6L138.4 612.9L138.8 610.9L140.1 610.6L140.9 611.1L139.9 613.2L140.6 614.6ZM160.1 612.3L159.9 610.6L158.8 611.7L158.1 610L155.9 609.4L157.1 606L159.6 606.9L159.2 608.4L160.7 610.5L160.1 612.3ZM156 603.7L155.8 601.4L157.6 601.5L158 600.2L159.8 600.8L159.6 602.3L156 603.7ZM143.2 599.5L143.4 597.2L144.1 598.9L145 598.4L145.4 600.3L143.2 599.5ZM162.5 596.1L161.5 594.1L163.5 592.5L163.8 593.4L162.5 596.1ZM251.1 697.9L253.2 695.6L253.3 693.7L253.7 693.3L253.8 696.5L251.1 697.9ZM170.1 645.5L167.7 644.1L167.9 640.6L167.3 640L166.9 640.9L166.5 639L167.7 638.1L169.5 639.2L171.9 635.2L171.5 632.9L176 636.1L178 635.5L181.3 636.5L181.7 638.9L180.3 637.8L180.6 640.2L178.5 640.9L178.4 639.8L177.8 641.7L176.3 641L176.1 639.3L174.8 639L176.7 643.4L173.1 642.9L174.2 644.3L170.1 645.5ZM241.5 624L240.4 620.6L242.9 619.6L243.2 617.7L244.7 617.8L243.7 619.1L245 620.5L243.6 621.6L244 623.5L241.5 624ZM162.7 607.4L162.1 604.7L163.2 604.5L163.9 606.4L162.7 607.4ZM237.5 604.1L236.6 602.7L239.2 601.6L239.4 602.7L237.5 604.1ZM168.3 588.3L164.7 584.1L165.7 583.2L165.7 584.1L167.8 585.8L168.4 585.6L168.5 582.4L169.5 584.7L170.6 584.9L170.4 583.7L171.9 584.6L171.3 583L172.7 582.8L170.5 580.8L173.9 581.6L174 584.8L171.7 589.3L170 588.1L171.2 586.3L169 586.4L168.3 588.3ZM191.9 565L193 565.5L193.1 566.9L189.7 566.9L189.5 565.2L192.6 566.6L191.9 565ZM183.4 563.6L185.9 564.7L183.6 566.6L185 566.6L184.5 568.9L180.5 572L179.1 570.3L179.8 572.1L178.3 572.5L178 568.2L178.5 567.6L178.6 568.6L180.4 569.2L178.9 567.4L181.8 564.8L179.5 564L179.4 566.2L177.2 566.2L175.4 562.3L176.6 561.4L174.4 559.2L174.1 556.4L173.4 556.2L172.7 554.8L175.2 556.6L174.1 553.8L175.9 553.2L179.6 555.3L178.3 555.5L179.2 558L179.3 556.4L180.4 557L179.9 557.7L180.2 557.8L180.8 556.3L182.5 556L183.3 557.1L180.9 558.2L183 558.4L184.1 560.3L184.5 559.5L186 560.2L184.6 561.3L183.7 560.5L182.8 561.6L184.6 561.6L183.4 563.6ZM185.8 560.9L187.6 561.2L187.2 562.4L188.3 562.3L188.3 563.4L186.5 562.4L185.8 560.9ZM196.2 557.4L196 561.1L197.2 562.6L196.9 563.6L192.8 555.8L195.9 552.8L197.5 553.9L197.8 555.9L196.2 557.4ZM182.9 554.8L181.1 555.5L180.1 554.6L181.2 553.8L182.9 554.8ZM193.1 553.2L190.9 553.9L189.2 552.9L192.6 552.5L193.1 553.2ZM184.2 552.5L180.3 551.4L181.4 550.6L180 550.6L179.8 548.1L178.8 548.7L177.9 547.6L178.7 547.3L177.7 546.8L177.6 543.7L175.7 542.2L175.5 539.8L174.5 539.9L173.3 542L173.6 542.3L173 543.2L172.7 541.5L174.3 538.6L173.4 536.7L176.7 535.6L173.8 535.9L174.6 532.3L177.3 532.9L177.5 535.8L180.1 535.7L184 537.9L185.3 540.6L186.7 539.8L188 540.3L186.6 541.8L187.3 541.4L191.2 544.9L194.1 544L193.6 538.8L194.3 538.4L194.7 540.1L195.8 540L196 544.1L197.7 543.3L198.4 545.1L201.1 546.5L201.6 548.5L200.1 549.3L199.6 550.3L200.6 549.7L201.3 552.5L200.1 551.9L199.2 553.1L197 551.6L194.7 553.1L191.1 550.1L188.9 550.3L189 552.5L187.2 551.8L188.6 553.3L187.4 554.4L186.8 552.1L184.7 550.8L184.2 552.5Z","c":[183.2,543.3]},{"n":"Romblon","m":1,"d":"M295.1 546.2L296.5 548.1L296 550.1L293.5 548.2L295.1 546.2ZM330.7 521.7L337.1 523L339.7 527.9L338.7 532.2L335.9 535.9L331.8 533.3L330.4 530.3L325.2 528.2L323.6 526L325.8 522.8L330.7 521.7ZM296.8 542.6L296.9 537.7L298.2 540.6L299.8 538L296.8 536.5L295.7 534.1L294.6 534.8L294 533.2L295.2 531.9L295.3 528.5L297.6 528L299.1 525.3L299.8 522.2L298.3 517.8L298.9 516.2L303.2 514.7L305.7 512.6L305.2 511.5L307.7 512.4L308.3 514.1L306.4 513.9L305.9 514.9L306.9 519.7L305.3 522L303.9 533.2L301.1 538.3L301.3 540.5L302.8 541.1L301.4 541.2L299.8 543.4L299.7 546.1L297.8 543.5L298.3 542.4L296.8 542.6ZM315.3 514.5L318 521.5L315.6 523.3L313.4 520.2L314.1 519.4L313 517.6L314.5 517.3L315.3 514.5ZM302.5 504.7L299.8 504.1L304 501.8L302.5 504.7ZM282.1 498.3L280.4 497L280.6 495.2L283.3 496.2L282.1 498.3ZM300.7 495L302.3 494.2L304.6 494.8L302.8 497.7L300.7 495Z","c":[333.1,528.8]},{"n":"Basilan","m":0,"d":"M298.4 894.3L298 894.9L299.7 894.5L299.5 894.7L297.7 895.2L297 895.3L297.6 894.5L296.4 894.7L296.3 893.4L298.4 894.3ZM297.3 890.3L297.7 891.8L296.3 891.9L295.8 890.9L297.3 890.3ZM293.9 871.7L293.8 873.7L295.4 875.1L295 878.1L296.1 878.4L301.3 878.1L300.3 875L301.7 871.5L300.5 870.5L300.5 868L302 866.9L303.2 867.1L304.2 869.2L306.7 869L307.1 871.8L312.6 872.1L318 874.6L316.6 876.5L311.2 877.1L309.8 884.4L301 887.3L296.3 887.6L296.3 886.1L294 885.2L292.6 882.3L291.1 881.7L291.1 877.4L286.7 875.9L287.1 873.3L288.9 871.3L292 872.6L293.9 871.7ZM276.4 878.5L276.5 876L274.4 872.1L274.9 870.9L277.2 872.9L276.4 878.5Z","c":[306.2,877.3]},{"n":"Lanao del Sur","m":0,"d":"M446.8 813.7L430.6 818.5L426.9 824.5L426.8 827.3L425.4 828L426.4 827.1L423.4 825.2L424.4 824.2L418 814.3L411 810.4L407.2 810.2L407.1 807.9L413.3 808.6L416 807.4L415.6 804.9L417.6 802.7L413.9 799.2L416 797.2L415.2 795.9L421.9 794.1L422.3 790.2L427.3 790.7L428.4 787.7L432.5 788.8L435.3 787.6L435.7 785.9L437.5 785L437.5 782.6L441.4 784.3L444.1 782.2L447.4 786.6L450.9 797.8L458.7 807.3L458.7 809.8L460.2 811.1L460.4 812.9L462.9 814.3L464.4 819.2L462.7 820.7L459.4 816.5L450.5 815.4L446.8 813.7Z","c":[436.3,805.1]},{"n":"Sulu","m":0,"d":"M227.6 944.3L228.4 944.6L227.9 944.7L226.9 943.4L228.9 940.3L227.6 944.3ZM226.8 942.3L225.4 940.3L226.4 938.4L228.1 937.8L229.1 938.5L228.8 940.2L226.8 942.3ZM229.8 937.8L231.4 936.5L234.7 939.4L233.1 942.3L231.4 942.6L229.5 940.5L229.8 937.8ZM228.2 931.7L228.8 930L230.5 929.4L233.7 930.4L232.1 932L228.2 931.7ZM188.6 917L186.9 913.5L187.2 912.9L187.6 912.6L188 912.7L188.7 913.8L188.3 914.2L187.8 912.8L187.2 913L188.6 917ZM213.3 905.2L212.7 904.4L212.9 903.3L214.2 904.4L213.3 905.2ZM207.5 904L205.9 902.7L208.4 901.7L208.8 902.6L207.5 904ZM220.4 895.3L219 896.9L218 896.1L219.4 894.4L219.9 895.6L220 893.8L219.7 894.3L219.3 894L219.2 894.4L219.1 894.6L218.9 894.6L219.9 892.8L220.4 895.3ZM212.8 897.6L209.7 896.8L209.5 895.9L212 896.2L214.2 889.5L216.7 888.4L215.4 897L212.8 897.6ZM230.9 892.7L231.4 891.5L232.8 891.9L231.9 893.5L230.9 892.7ZM222.6 888.3L220.7 887.1L223.3 885.8L223.4 887.7L222.6 888.3ZM242.6 932.5L241 930.9L244.2 930.3L244.3 931.5L242.6 932.5ZM233.2 929.3L234.3 926.5L236.1 927.2L235.7 929.7L234 930.4L233.2 929.3ZM247.9 923.4L248.7 921L251.5 921.8L252.4 923.5L249.5 925.3L247.9 923.4ZM274.1 913.3L275.2 914.7L273.6 916.1L272.9 914.7L274.1 913.3ZM260.9 916.9L256.9 920L256.2 920.2L256 920L256 919.7L256.3 920.1L257.1 919.5L254 918.4L254.1 915.8L251.6 914.7L247.7 917.7L244.2 918.1L245.2 918.5L244.5 919.3L241.5 916.3L235.6 918.5L233.1 916.8L232.7 914.8L235.5 910.4L239.2 909.3L241.8 906.6L249.2 907.3L252.3 912.2L256.5 910.9L261.5 911.7L261.3 912.6L262.7 911.4L264.7 912.3L265.1 914.4L262.6 915.8L262.7 917.8L260.9 916.9ZM271.2 912.3L271.5 910.4L271.9 909.6L272.3 909.5L272.7 909.5L272.7 911L271.2 912.3ZM280.8 912.2L278.4 912.2L280.4 910.3L279.4 909.8L279.6 908.6L281.2 909L279.7 908.7L280.5 909.8L282.8 910.1L280.8 912.2ZM262.5 909.9L264.3 908.6L265.6 910.2L263.4 911.1L262.5 909.9ZM284.8 906.5L290.2 910.8L295.7 908.9L290.2 912.1L285.7 908.8L284.8 906.5ZM289.5 903.2L289.9 904.9L288.1 904.8L287.9 903.9L289.5 903.2ZM288.1 901.4L288.9 903.2L287.4 904.2L286.8 902.7L288.1 901.4Z","c":[249.3,913.6]},{"n":"Tawi-Tawi","m":0,"d":"M147.7 984.7L146 991.8L146.1 990L146.9 987.7L145.8 987.3L147.7 984.7ZM149.7 992.8L150.6 986.2L149.7 977.2L152 981.9L152.7 986.3L151 992.5L149.7 992.8ZM170.4 983L173.7 983.6L173.8 984.2L170.7 984.1L170.4 983ZM169.3 977.1L171 976.5L171 977.8L171.5 977L173 977.9L172.9 980.2L170.1 980.7L169.3 977.1ZM181.2 974.7L181.1 971.7L182.4 971L183 972.1L181.2 974.7ZM166.7 971.6L166.4 970L168.4 969.9L168.3 971.2L166.7 971.6ZM166.9 969.9L167.8 966.3L170.4 964.6L170.1 966.1L170.9 968.5L169.3 968.1L169 969.5L166.9 969.9ZM95.7 854.2L89.7 852.7L88.4 850.6L94.5 849.1L95.3 850.3L94.2 852.5L95.7 854.2ZM193.9 969.3L195 970L194.2 971.1L192.4 970.7L193.9 969.3ZM200.3 964.9L199.4 966.6L198.1 967L197.3 966.6L199.5 964.3L200.3 964.9ZM201.8 962.7L202 964L201.3 965L200.2 963.7L201.8 962.7ZM170.5 964.6L172.1 962.7L173.2 963.3L178.3 960.7L180.4 957.8L183.4 958.1L191.8 951.4L194.4 951.3L194.1 953.9L196.4 955.4L194.3 964.8L191.3 963.3L192.8 961L191.4 960.5L191.1 961.9L190.8 962.2L189 959.4L187.2 963L186.8 962.3L185.8 963.2L186.1 961.8L185.1 962.3L185 961.1L183.7 961.1L181.3 962.7L181.8 963.7L180.8 963.5L179.7 967.2L176.8 966.8L176.9 967.6L174.5 967.6L174.7 968.5L172.7 968.2L173.4 968.6L173.5 969.2L171.1 968.6L171.4 965.4L170.5 964.6ZM197.3 961.6L195.7 960.5L197.4 956.6L200.3 959.6L197.3 961.6ZM200.9 959.2L203.1 957L201.7 961.1L200.9 959.2ZM199.4 950.2L198.9 949.1L201.4 949.1L200.9 949.8L199.4 950.2Z","c":[183.6,960.1]},{"n":"Maguindanao del Norte","m":1,"d":"M440.1 829.6L435.8 841.5L438 841.8L439 838.5L441.9 837.8L442.3 839.6L444.6 839.6L440.5 848.4L439.7 848.2L437.4 852L435.3 850.5L433.9 852.5L428.9 853.9L426.8 856.6L424.3 855.8L423.1 860.8L423.3 867.2L417.9 867.6L418.2 866.3L416.4 864.3L414.2 865.8L414.5 864.4L413.5 864.7L413.7 863.3L412.6 862.9L414.4 860.1L413.4 857.4L415.9 849.6L419.8 843.3L422.6 842.9L426 840.3L425.1 839.8L425.8 838.7L428.1 836.9L428.5 831.5L427.8 830.9L431 831L430.4 827.4L426.8 827.2L427.8 822.7L430.6 818.5L446.8 813.7L444.3 825.7L443 825.7L440.1 829.6ZM416.8 832.4L420.4 829.4L417.2 834.2L416.8 832.4Z","c":[430.8,840.6]},{"n":"Maguindanao del Sur","m":1,"d":"M456.6 841.1L462.6 843.8L461.1 847.4L464.2 848.2L464.2 855.1L463 855.1L463 857.3L463 859.1L464.4 860.3L463 863L464.1 863.1L464.5 864.5L471.7 864.9L472.1 867.8L474.9 868L474.9 869.3L467.8 871.3L468.7 872.6L466.8 873.4L466.6 875.4L461.9 875.8L462 873L460.5 872.1L462.5 871L457.9 863.3L456.6 864.4L455.1 860.1L453 858.7L450.9 860.1L451.2 861L449.9 861L449.8 865L445.7 865.6L446.1 868.3L440.1 868.3L432.2 870.2L432.5 866.8L430.4 866.6L429.3 868L423.3 867.2L423.1 860.8L424.3 855.8L426.8 856.6L428.9 853.9L433.9 852.5L435.3 850.5L437.4 852L441.6 846.5L445.3 850.2L447.4 849.6L450.2 853.8L456.2 854.8L456 853.6L458.2 852L456.3 847.7L459.1 845.4L458.7 844L456.5 843.2L456.6 841.1Z","c":[443.3,858.5]},{"n":"Metro Manila","m":0,"d":"M457.9 851.2L455.7 855.2L452.7 853.5L450.2 853.8L448.5 851.2L451.6 852.3L451.9 849.8L449.1 848.9L448.5 850.6L447 850L450.1 848.1L448.8 847L448.8 844.7L450.4 847.2L451.7 847.3L452.1 844.6L452.9 844.5L452.6 846.3L453.8 848.2L452.5 848.2L452.5 849.1L455 849.9L455.2 849.1L455.8 851.3L457.9 851.2ZM446 850.2L442.6 848.3L443.5 846.4L442 845.4L443.1 841.7L446.3 843.7L446.5 846L447.4 846.1L446 850.2ZM459.1 845.4L458.3 846.8L457.5 846L456.9 848L454.8 845.7L455.5 843.9L459.1 845.4ZM460.3 842.8L458.5 841.4L459.6 839L461.9 839.9L462.1 842L460.3 842.8ZM440.2 837.9L438 841.8L435.8 841.8L437.4 837.9L440.2 837.9ZM458.4 839.8L455.7 842.9L454.9 840.4L457.2 839.7L455 837.9L457.8 836.7L458.4 839.8ZM466.4 833.6L469.2 833.8L469.2 839L466.3 837.6L465.6 843.1L462.9 843.5L463.9 838.6L460.6 838L460.5 835.9L465.1 835.8L466.4 833.6ZM442.4 826.6L442.1 830.1L439.7 830.2L442.4 826.6Z","c":[444.6,845.9]},{"n":"Batanes","m":0,"d":"M290.5 56.4L289.4 54.8L289.6 50.6L292.3 53.2L290.5 56.4ZM293.8 50.6L294.4 47.5L296.8 45.2L296.2 43.8L298.9 42.6L300.4 43.1L300.8 44.1L296.5 47.2L297.6 48.5L297.1 50L295.5 51.2L293.8 50.6ZM287.2 30.7L286.4 27.9L289.2 22.5L290.9 21.9L291.9 23.4L291.5 26.5L287.2 30.7Z","c":[289.7,26.3]},{"n":"Cagayan","m":1,"d":"M308.9 216.9L279.5 222L277.6 221.7L276.1 218.4L275.3 219.1L269.3 216.5L268.1 211.9L265.9 212L263.3 204.8L258.1 203.1L261.1 197.2L258.6 193.8L260.5 189.7L261.5 188.3L265.2 189.9L267.1 189L267.1 184.6L268.6 183.1L268.8 177.7L267.4 174.9L268.3 173.6L256.9 168.7L253.4 165.8L253.2 162L249.3 159.4L247.1 159.4L245.4 162.3L245.6 159.5L243.8 159.6L240.3 164L237.7 164.2L238.5 157.2L242.2 154.8L243.8 155.6L245.9 154.4L249.6 154.7L276.6 170.9L277.7 170.4L293.1 176.1L300.2 174.1L304.6 169.1L306.5 168.8L306.1 166.4L307.5 161.4L312.4 160.9L313.3 165L317.5 169.2L318.5 173.4L316.5 178.8L314.1 181.9L311.4 182.9L308.6 186.8L309.5 188.4L309.9 196.9L306.8 204.4L308.6 210.1L307.9 211.1L308.9 216.9ZM305.3 158.4L307.9 157.2L307.7 160.6L305.5 161.9L306.2 159.2L305.3 158.4ZM266.7 140.7L256.7 141.1L256.6 139L264.5 137.6L268.4 139.1L266.7 140.7ZM290.2 143.3L288.6 140.3L291.2 138.5L289.9 136.7L291.2 135.2L290.9 133.6L292.8 131.9L295.5 131.8L298.3 134.4L298.1 135.4L292.4 139.9L290.2 143.3ZM254.1 131.2L251.7 127.8L252.9 121.7L254.7 125.7L255 130.4L254.1 131.2ZM270.1 117.3L263.8 115L263.1 112.3L260.6 110.2L263 109.8L263.1 108.5L268.8 110L270.9 108.7L270.8 112.8L271.9 115.6L270.1 117.3ZM296.3 103.4L293 101.2L292.5 99.3L297 97.6L298.3 98.8L298.4 101.2L296.3 103.4Z","c":[287.9,188.2]},{"n":"Isabela","m":1,"d":"M308.9 216.9L310.7 223.3L313.4 227.3L312.6 228.1L313.6 228.7L313.2 230.2L315.4 230.2L316 232L319.5 232L320.6 230.8L321.8 232.6L320.6 232.8L322 233.3L322.1 234.6L322.9 234.1L321.8 231.5L322.6 232L324.7 236.2L324.5 237.5L323.8 235.1L322.9 235.5L324 239.2L322.8 241.7L323.2 243.6L326.4 244.6L324.7 244.8L324.9 245.9L328.6 243.5L329.2 244.5L329.7 246.1L326.1 253.4L326.6 255L324 262.3L324.2 264.1L316.2 278.9L312.3 283L299.8 281L283.8 288.4L272.7 274.3L263.4 273.3L263 268.4L261.9 266.9L259.4 266.7L260.4 265.8L259.8 264.9L260.9 265.5L264.7 263L270.7 261.7L273.5 257.4L273.5 244.2L271.2 235.5L275.7 226.7L277 226.9L278.1 222L308.9 216.9Z","c":[299.8,252.6]},{"n":"Nueva Vizcaya","m":1,"d":"M266.3 273.9L263.6 275.6L262.7 281.6L261.1 282.1L262.2 284.9L266.4 286.3L265.8 289L270.7 291.7L262.6 299.9L257.7 299.4L259.8 301.6L259.3 302.5L256.4 302.3L259 306.3L261.6 308L260.1 310.7L267.8 316.5L267.8 318.8L258.7 323.7L256.8 326.7L251.5 316.7L250.4 306.6L243 303.7L232.6 304.9L230.9 301.9L226.6 300.1L228.5 293.7L231.1 292.8L233.7 285.8L233.3 281.7L234.6 276.3L236 276L239.2 277.8L244.4 274.3L252.6 273.5L256.4 271.9L257.1 272.5L257.1 270.6L258.5 270.2L259.7 266.9L260.9 266.6L263 268.4L263.4 273.3L266.3 273.9Z","c":[246.6,296.7]},{"n":"Quirino","m":1,"d":"M302.2 281.4L289.7 297.1L270.1 315L266.3 315.9L260.1 310.7L261.6 308L256.8 303.6L256.4 302.3L259.3 302.5L259.8 301.6L257.7 299.4L262.6 299.9L270.7 291.7L265.8 289L266.4 286.3L262.2 284.9L261.1 282.1L262.7 281.6L264.4 274.9L268.5 273.4L272.7 274.3L283.8 288.4L299.8 281L302.2 281.4Z","c":[279.8,294.9]},{"n":"Bataan","m":0,"d":"M214.1 382.8L213.3 382.8L214.1 384.5L213.5 383.2L213.1 383.4L213.5 388.7L215.8 393.4L217.6 403.2L215.1 406.5L210.6 405.8L209.9 406.3L210.9 407.5L209.5 407.4L207.8 405.2L204.4 404.5L203.5 400.5L204.6 396.7L203.1 394.4L199.9 394.4L197.1 391.9L196.2 388.4L197.9 388L198.2 386.7L202.7 385.3L201.5 380.7L205.4 378.9L206.4 377.1L209.5 376.8L209.7 378.6L214.1 382.8Z","c":[206.6,392.1]},{"n":"Bulacan","m":0,"d":"M258.5 360.1L260.5 372.2L259.5 381.9L249.9 382.6L245.5 386L242 384.9L241.6 386.2L239.5 386.6L239.2 388.5L235.9 387.8L237 390.7L235.4 389.2L234.7 389.9L234.6 388.5L233.6 389.4L232 388.7L229.6 385.3L228.5 386.7L225.9 386.5L226 385.3L225.5 386.5L224.8 385.6L221.8 385.7L222.4 382L224.7 379.8L223.9 379.6L224.5 376.3L226.8 376.6L231.7 374.4L231.5 373.6L233.4 372.5L232.9 371.4L233.8 370.1L235 370.6L236.2 369.6L234.2 367.7L236.3 366.7L237.3 364.3L235.2 361.5L236 359L243.2 356.2L248.7 355.7L250.7 355.8L252.1 358.7L254.1 359.8L258.5 360.1Z","c":[246.5,373.2]},{"n":"Nueva Ecija","m":0,"d":"M256.8 326.7L262.3 342.9L261.2 347.6L260 348.5L261 351.6L258.5 360.1L254.1 359.8L252.1 358.7L250.7 355.8L248.7 355.7L243.2 356.2L239.2 358.4L234.5 359.2L232.5 361.5L227.3 358.9L226.7 355.9L224.7 356.6L225.9 352.8L224.8 351.8L225 349.1L226.4 346.8L223.8 339L225.8 335.5L222.4 334.9L220.2 332.3L217.6 323.1L224.3 320.9L227.9 322.4L229.6 324.4L231 322.9L235.5 314L232.6 304.9L243 303.7L250.4 306.6L251.5 316.7L256.8 326.7Z","c":[239.6,332.6]},{"n":"Pampanga","m":1,"d":"M224.6 355.4L224.7 356.6L226.7 355.9L227.3 358.9L232.3 361.4L236 359L235.2 361.5L237.3 364.3L236.3 366.7L234.2 367.7L236.2 369.6L235 370.6L233.8 370.1L232.9 371.4L233.4 372.5L231.5 373.6L231.7 374.4L226.8 376.6L224.5 376.3L223.9 379.6L224.7 379.8L222.4 382L221.8 385.7L219.8 385.9L216.9 382.2L215.9 382.5L215.4 381.4L215 381.1L215.8 382.7L215.6 383.1L213.8 382.7L209.7 378.6L209.9 377.2L206.2 372.9L205.4 367.6L202.4 363.9L203.1 362L212.3 358.3L214.8 356.2L224.6 355.4Z","c":[220.1,370.6]},{"n":"Tarlac","m":1,"d":"M216.2 320.3L220.2 332.3L222.4 334.9L225.8 335.3L223.8 339L226.4 346.8L224.7 351L225.9 352.6L225.5 355.6L214.8 356.2L212.3 358.3L203.2 362L201.3 357.9L198.1 354.6L191.3 350.3L192.7 341L194.7 337.4L197.1 336.1L197.1 333.6L200 333.2L203.6 327.2L206.6 326.8L209 328.7L213.9 326.2L216.2 320.3Z","c":[208.7,341.1]},{"n":"Zambales","m":0,"d":"M190.9 325.8L197.1 336.1L194.7 337.4L192.7 341L191.3 350.3L201.3 357.9L203.1 362L203 365.5L205.4 367.6L206.2 372.9L208.7 376.9L206.4 377.1L205.4 378.9L201.8 380.4L201.4 383L202.7 385.3L198.2 386.7L198 387.7L195.8 386.3L198.1 385.2L196.7 384.7L197 383.7L198.5 384.4L199 383L197.3 382.6L197.2 381.2L195.9 381L195.3 379.4L193.8 379.5L194.2 383.5L192.7 386.9L191 387.7L188.6 386.5L189.4 385.9L188.7 385L186.5 384.9L188 382.9L186.3 383.1L186.5 380.8L184.7 378.8L185.1 368.1L182.5 356L175.2 346.2L176.8 345.1L176 342.4L178.2 343.3L178.5 342.1L179.2 341.5L179.6 341.7L179.7 341.7L179.8 341.6L177.9 338.7L178.7 338.3L178.7 337.7L176.7 338.4L175.9 334.7L177.7 330.4L173.9 328L176.4 326.4L174.9 323.3L180.5 323.5L182.6 319.8L183.7 319.6L186.1 322L190.1 322.5L190.9 325.8Z","c":[188.6,353.6]},{"n":"Aurora","m":0,"d":"M260.5 372.2L258.3 360.5L261 351.6L260 348.5L261.2 347.6L262.3 342.9L257.2 326L258.7 323.7L267.8 318.8L267.3 316.4L270.1 315L289.7 297.1L302.2 281.4L312.5 282.8L310.4 286L311.7 288.3L313 286.7L312.2 290L309.3 293.8L310.1 294.6L312.5 293.4L310.7 297.7L302.9 304.8L303 306.5L300.6 309.1L298.1 310.2L300.4 305.7L304.2 302L304.3 299.7L306.3 298.5L306.5 296.3L304.2 296.2L302.9 297.5L303.4 300.6L299.9 301.2L295.1 304.4L291.3 304.7L285.8 308.3L283.7 307.8L272.7 318L273.1 325.5L273.9 326.8L277.4 326.9L277.6 329.7L275.9 329.6L276 330.9L274.6 331.6L276.2 331.8L276.3 333.1L274.3 334.1L271.3 339.2L269.1 340.6L268.5 346.3L265.5 350.1L263.9 348.9L262.7 350.1L262.1 353.4L264.6 359L263.7 361.7L262.5 361.9L263.8 362.8L263.6 364.7L260.4 369.6L260.5 372.2Z","c":[267.0,326.8]},{"n":"Batangas","m":1,"d":"M245.4 457.9L246 460L244.9 460.4L242.7 457.7L245.4 457.9ZM230.3 450.8L233.4 452.7L236.3 452.7L237 453.7L232.7 453.9L230.9 452.9L230.3 450.8ZM216 418.2L223 421.6L222.1 422.2L222.5 423.8L226.4 423.9L226.6 424.9L230.8 426.7L231 428.6L233 427L238.5 426.1L239 424.8L242.8 422.7L251.6 424.1L252.8 430.4L254.7 433.1L254.3 437.7L256.7 439.7L261.7 439.8L262.9 441.3L266.6 442.2L265.5 446.6L266.6 448.6L266.1 450.2L267 449.9L267.7 450.9L264.8 452.7L263.4 451.7L261.5 452.5L256.9 456.2L250.7 453.3L244.7 454.9L242.3 453.9L243.8 449.2L242.7 446L238.8 445.1L233.9 451L232.8 448.8L235.9 446.3L234.4 442.7L235 439.4L233.1 437.9L225.1 435.8L222.5 437.7L223.7 441.4L220.5 440.4L219.8 441.1L221.2 444.6L219.8 445.8L218 443.3L218.2 438.2L216.9 433.6L218.6 433L217.6 431.3L218.1 425.4L214.9 423.9L217.3 423.3L215.3 421.7L217.5 421.3L215.7 420.4L216 418.2Z","c":[242.3,437.2]},{"n":"Cavite","m":1,"d":"M241.1 410.9L240.6 413L242.1 411.9L244.7 412.3L242.1 416.9L243.3 416.6L243.3 419L241 422.2L242.3 422.9L236.5 426.8L233 427L231 428.6L230.8 426.7L226.6 424.9L226.4 423.9L222.5 423.8L222.1 422.2L223 421.6L217.8 418.9L218.1 416L223.5 414.8L232.6 406.1L233.9 402.5L235 402L234.5 402.9L235.3 402.9L235.5 403.2L234.1 403.5L233.7 404.9L238.4 403.5L241.1 410.9Z","c":[231.5,415.3]},{"n":"Laguna","m":1,"d":"M254.6 434.2L251.6 424.1L241.1 422.7L243.3 419L242.5 415.7L244.7 412.3L242.1 411.9L240.6 413L240.7 411.5L243.5 409.3L245.5 410.6L251 417.8L250.8 420.8L257.1 420.3L263.7 413.9L265.9 414.6L265 413.7L266 412.8L264.7 412L265.3 411.4L267.9 413L267.9 409.7L265.5 407.7L262.7 411.6L261.5 410.2L262.2 400.5L263.5 399.4L266.4 399.3L266.6 396.3L268.4 399.9L271.2 400L272.4 402.5L270.9 403.8L277.3 415.9L274.7 420.1L275.8 420.6L274.8 422.4L270.9 421.8L271.5 422.6L270.2 423L270.3 425.4L268.7 427.9L265.4 428.2L259.5 432.9L254.6 434.2Z","c":[270.1,415.2]},{"n":"Quezon","m":1,"d":"M285.9 439.2L286.2 437.4L284.4 439L283.6 438.5L283.9 435.5L286.2 435.8L286.4 435.6L286.5 435.7L286.2 437.4L287.2 438.1L285.9 439.2ZM294.7 417.9L306.2 426.8L309.7 431.6L308 431.9L297.9 425.3L293.7 420.7L294.7 417.9ZM266.7 442.9L261.7 439.8L256.2 439.4L254 436.1L254.6 434.2L259.5 432.9L265.4 428.2L268.7 427.9L270.3 425.4L270.2 423L271.5 422.6L270.9 421.8L274.8 422.4L275.8 420.6L274.7 420.1L277.3 415.9L270.9 403.8L272.4 402.5L271.2 400L268.4 399.9L266 394.7L263.9 393.6L263.9 390.6L259.7 388.1L260 375.2L261.1 371.3L260.4 369.6L263.3 365.7L263.8 362.8L262.5 361.9L263.7 361.7L264.6 359L268.3 361.2L269.8 368.7L272 371.4L274.2 378.6L276.1 380.8L275.4 382.3L283.2 390.3L279.9 389.9L280.6 390.1L276.8 392.6L277.5 392L276.5 390.8L275.5 392.9L278.8 408L282.8 412.4L282.8 415.6L284.6 417.2L284.3 419.7L282.9 421.4L285.2 424.6L295.6 432.7L304.5 436.6L312.3 438.3L313 435.4L310.4 434.4L309.4 432.4L316.3 434.4L315.9 432.5L317.3 432.4L317.7 430.8L315.8 431L315.6 429.7L310 426.4L308.4 423.6L308.4 422.4L309.8 423.7L309.4 422.3L311.3 420.6L313.1 420.8L313.4 417.5L315 417.9L313.9 421.6L314.8 422.3L314.4 424.6L317 423.9L316.5 428L321.2 428L325.2 423L345.2 431.2L331 435.3L329.8 434.2L329.5 436.6L323.3 435.4L329.5 443L328.6 445.8L329.4 448.1L327.2 448.2L326.9 450.2L330.7 457.1L332.4 457.5L336 460.4L334.8 461.1L331.8 458.2L337.6 466.9L338.4 475.5L339.9 478.5L333.8 482.3L331.8 481.3L328.2 477.2L329.4 472.3L327.5 467.7L323 463L322.3 460.5L318.2 458.4L317.6 456.6L315.7 456.5L315.2 457.5L314.1 457.1L315 456.4L314.4 455.6L310.9 455.9L310.6 453.7L304.5 444.9L301.9 445.5L300.4 443.6L297.6 443.6L297.3 441.6L292.3 440.3L291.3 438.2L288.5 438.5L287.8 435.4L282 433.8L280.5 435L281.7 436.7L275.5 438.1L266.7 442.9ZM287.3 414.4L290 414.1L288.2 417.1L287.3 414.4ZM322.5 388L324.3 390.3L316.7 391.4L318.3 389.3L322.5 388ZM311.1 381.4L310 383.6L314 384.9L313.1 388.8L312.2 386.9L305.2 383.8L304.2 381.5L306.6 382.3L311.1 381.4ZM294.9 368.5L295 369.6L296.1 368.5L297 369.8L299.9 370.2L299.1 371.6L301.7 371.7L302 374.1L301.9 374.9L300.6 372.5L299.4 372.6L298.2 374.5L299.9 373.9L300 376.7L296.8 377.6L297.6 381.5L300 383.2L300.9 389.1L299 391.9L295.2 394.4L293.1 391.5L293.2 388.6L295.1 389.3L293.4 383.8L291.6 381.9L289.1 374.7L288.8 376.3L287.1 375.8L288.3 371.7L288.9 371.8L288.5 372.5L289.1 372.3L288.9 373L289.3 372.9L289.2 369.6L290.9 370.7L294.9 368.5ZM299.6 379.5L302.4 379.9L303.7 381.5L300.2 381.3L299.6 379.5Z","c":[279.5,420.6]},{"n":"Rizal","m":1,"d":"M253.3 406.7L254.3 411L255.8 411.8L254.4 412.2L254.1 414.8L252.8 411.8L253.3 406.7ZM266 394.7L266.4 399.3L263 399.6L261.4 402.8L262.2 404.1L261.4 404.7L261.5 410.2L262.5 411.7L258.4 414.8L258 412.4L260 407L259.2 404.3L256.1 401.7L254.3 401.8L253.9 403.6L253.1 403.6L253.2 406.6L252.8 407.3L248.3 399.9L246.2 401L246.1 394.8L248.1 392.5L246.4 391.5L248.1 385.4L246.3 386.2L246 385.8L249.9 382.6L259.5 381.9L259.7 388.1L263.9 390.6L263.9 393.6L266 394.7Z","c":[255.9,398.4]},{"n":"Albay","m":0,"d":"M423.5 477.8L427.8 479.3L428.6 481.5L419.3 479.6L423.5 477.8ZM414.6 474.5L415.1 476.4L416.4 474.8L417.6 476.5L418.3 475.2L421.7 476.5L417.2 479L415.4 477.7L413.1 478L410.5 474.8L414.6 474.5ZM392.5 460.7L393.9 462.5L397 463.4L400.9 469.8L399.9 469L400.9 472.5L405.1 474.7L405.1 476.7L406.1 477.9L405.9 476L406.8 476.1L407.1 477.1L407.7 477.6L408.2 477.6L407.8 478.5L402.7 478.3L401.6 483.3L403.4 485.1L402.8 486.6L401.3 486.6L401.8 488.5L404.3 489.2L407.9 483.8L410.2 483.5L411.8 485.2L410.8 489.1L404.8 490.7L402.3 492.8L399.3 489.6L395.6 491.3L389.4 490.5L385.6 492.7L381.1 489.2L376.1 491.6L373.8 488.5L374.7 487L374.2 483.2L376.5 480.1L373.9 476L379.3 473.8L379.2 471.7L381 472.2L382.7 470.2L385.6 469.9L386.9 471.6L390.8 470.1L391.8 466.4L389.3 462.8L389.3 461.1L392.5 460.7ZM407.2 470.7L411.8 472.3L409.2 475.1L410.8 477.8L409.1 478.5L406.5 475.6L407.8 473L406.5 471.8L407.2 470.7ZM402.2 467.6L407.2 469.8L406.3 471.3L402.8 468.8L402.2 467.6Z","c":[389.8,476.7]},{"n":"Camarines Norte","m":0,"d":"M360.9 441.7L354.8 436.9L352.9 436.8L351 434.1L325.2 423L321.2 428L316.5 428L316.8 425.9L319.3 424.7L318.3 419.8L319.5 420.9L319.2 418.5L319.9 419.2L320.8 419.3L321.2 419L319.9 416.8L321 416.6L321.3 414.7L322.9 414.8L323.1 413.1L323.9 414L326.2 411.6L329.3 412.9L328.6 411.4L329.3 411L334.5 413.1L333.6 413.7L335.1 414.7L335.7 412.7L335.9 415.1L336.8 413.1L337.3 414.6L337.9 414L339.3 415L337.9 411.8L339.1 411.3L340.6 411.7L341.1 413.3L342.8 412.3L345.1 413.3L345.6 415.5L348.4 415.1L352.4 418.8L351.4 418.6L351.6 418.8L351.6 419.1L351.4 418.8L351.1 418.9L352.2 420.2L351.8 420L351.3 420.1L351 419.9L350.8 419.9L350.8 420L352.2 420.7L353.7 420.6L356.1 423L355.8 423.2L355.2 422.9L354.9 423L358.2 425.3L357.8 426L358.8 425.3L359.9 426.1L359.1 429.8L362.2 433.1L362.9 438.5L361.2 439.6L360.9 441.7ZM354.4 402.4L354.1 405L351.5 405.3L352 404.2L354.4 402.4Z","c":[346.6,426.4]},{"n":"Camarines Sur","m":1,"d":"M392.5 460.6L389.3 461.1L389.3 462.8L391.8 466.4L390.8 470.1L386.9 471.6L386 470.1L384.1 469.8L380.9 471.3L381 472.2L377.3 470.5L376.5 472.4L378 473.6L373.8 476.5L371.3 474.6L368.4 465.9L360.1 461.5L355.9 460.7L350.8 457.4L347.5 453.6L345.5 453L347 453L349.2 450.6L347.7 447.9L342.2 445.4L343.8 444.9L341.1 443L337 442.8L336.1 441.6L336.9 440.9L336.4 439.1L332 437.7L331.2 436.6L332 435.8L331 435.3L345.2 431.2L351 434.1L352.9 436.8L354.8 436.9L360.9 441.7L360 445.4L364.4 448.7L370.8 448.3L376.3 444L374 438.2L376.8 435.7L377.3 433.9L376.9 433.5L376.9 433.4L377.2 433.1L374.5 436.4L372.6 435.1L372.9 434.3L370.9 433.9L370.7 431.8L373.2 432.1L370.8 430.5L373.9 430L372.4 427.6L376.1 429.6L375.4 428L377.6 427.9L376.6 426.8L377.3 425.7L379.3 429.6L377.9 429.7L377.4 431.2L378.6 431.5L380 429.9L379.7 431.5L380.8 431.5L380.7 433.3L380.9 432.6L381.7 432.9L381.2 435.4L382.3 436.8L383.8 436.8L384.2 435.7L383.4 435.6L383.5 434.1L383.7 434L386.7 435.5L386.1 437.2L387.6 436.2L387.7 437.2L389.1 437.4L389.3 436.1L392.4 438.5L396.2 438.4L397.2 439.3L398.7 438.7L398.7 435.4L403.2 441.4L407 443.4L408.1 442.5L409.6 444.1L412.5 444.3L412.9 446.8L414.1 446.7L414.6 448.7L414.1 449.5L412.2 447.8L412 448.8L409.1 447.7L404.4 450.7L391.5 448.3L389 453.4L388.7 455.3L389.7 455.9L388.4 457.6L389.4 458.9L391.5 458.7L392.5 460.6ZM405.3 433.3L406.5 433.8L406 438.6L404.9 437.3L405.3 433.3ZM395.1 433.3L396.6 434L397 435.4L393.9 437.6L392.6 437.1L392.2 435.3L392.9 434.3L393.7 435.7L394.5 434.1L396 435.3L395.1 433.3Z","c":[369.4,451.1]},{"n":"Catanduanes","m":0,"d":"M428 426L431.3 430L432.5 435.2L434.3 436L434.2 438.2L436.5 435.6L438.6 439.7L438.9 438.4L439.8 439.2L439.3 440.5L440.6 441.2L439.3 441.8L440.2 441.9L440.6 444.2L438.9 445.3L439.9 446.9L438.4 449.1L440.3 452L435.9 453.6L436.4 456.3L435 458.5L435.7 459L435.8 459L436.1 459L436.1 459.1L435.2 459.2L434.5 458.9L434.1 456.6L430.9 456.4L428.2 458.5L428.1 461L422.2 456.4L418.7 455.9L419.2 454.8L417.3 452.2L421.5 449.7L423.9 444.2L423.4 438.8L424.6 436.5L423.4 433.4L424.1 431.2L423.3 428.4L425.9 429L428 426ZM435 432.8L435.8 434.9L436.4 434.5L436.7 435.2L435.1 435.5L434 434.5L434 433.3L434.7 434.3L435.3 433.9L435 432.8Z","c":[432.0,443.5]},{"n":"Masbate","m":1,"d":"M419.6 568.8L411.7 560.3L406.3 557.4L399.6 556.1L399 554.6L400.8 553L395.4 549.1L394.9 548L396.1 547.2L392.5 547.5L393.4 546.3L388.9 539.2L382.5 539.9L379.1 545.3L375.8 547.5L374.7 550.7L366.7 557.6L365.7 556L368.8 550.9L370.1 544.1L371.8 544.7L371.4 543.7L373.8 542.2L373.1 540.1L373.9 539.2L374.2 540.1L375 539.7L374.8 537.7L374.1 539.1L373 537.3L370.7 539L370 537.7L371.1 537.6L370.4 535.9L373 532L372.5 529.4L374.2 526.7L373.4 526.9L374.2 525.8L373.2 524.5L372 524.6L371.1 516L379.6 519.5L377.2 519.6L378.4 523L376.3 524L376.6 526.1L378.6 523.7L379.8 524.1L379.1 521.7L383.3 521L388.8 525.1L389.8 524.3L390.7 527.3L393.1 529.1L391.3 530.7L393.7 530.3L394 529.3L395.4 531.5L398.1 532.1L403.2 540.3L404.2 537.4L407.4 540.3L408.4 538.7L409.7 539.4L419 553.9L418.7 555.1L415.8 551.3L415.4 552.7L420 560.8L419.1 563.9L420.3 567.5L419.6 568.8ZM392.6 511.5L393.9 510.4L395.7 513.1L399.8 515.1L400.4 517L400.1 517.4L399.7 517.2L399.5 517.4L402.4 522.4L402.6 527L403.7 527.5L403.6 531.7L397.4 524.2L393.2 515.5L392.4 516L391.3 514.1L391.4 512.8L392 514.1L393.4 513.9L392.6 511.5ZM379.8 510.4L376.9 508.7L372.7 502.1L369 501.5L367.3 499L365.4 498.4L366 497.6L363.7 496.6L362.7 494.1L361.9 494.6L361.1 492L356.5 491.6L355.3 489.7L354.1 490.5L354 487.9L355 486.9L353.1 485.2L355.5 484.3L356.2 485L357 482.5L357.9 483.7L359.9 483.9L359.6 485L360.5 484.7L368 497.2L373.6 498.7L374.1 502.8L379.8 510.4Z","c":[401.0,542.3]},{"n":"Sorsogon","m":0,"d":"M385.6 492.7L389.4 490.5L395.6 491.3L399.3 489.6L402.4 492.8L407.7 489.6L410.5 489.5L411.8 484.7L414.3 485.4L420.9 491.9L422.6 488L426.9 488L427.5 490.9L424.8 492.1L424.3 495.9L422.8 497.5L424.6 498.4L424 499.6L425 500.4L425 503.5L423.6 508L423.7 512.3L421.4 513.8L422.3 516.3L420.9 517L421.6 518.6L418.5 520L418 519.1L417.4 519.9L414.4 518.8L412.2 516L412.3 514.5L411.1 514.9L408.6 512.7L406 502.3L407.9 500.4L407.6 500L407.7 499.5L412.1 501.4L413 499.4L415.1 499.2L414.9 499.5L415.8 500.3L418.3 496.5L417.2 493.6L414 494.7L409.1 493.3L408.9 495.9L407.4 498.1L406.2 497.8L405.9 499.5L405.1 498.6L404 500.2L401.8 499.2L400.4 501.3L400.2 499.8L398.9 499.4L400.8 498.9L400.3 498.1L398.8 499L397.9 498.2L398.7 499.3L397.9 500.1L396.7 497.5L398.1 497.1L399 495.5L396.1 496.9L395.5 499.8L389.9 495.2L388.4 495.8L385.6 492.7Z","c":[415.8,502.3]},{"n":"Aklan","m":1,"d":"M332.5 578.9L330.1 579.9L329.8 582.4L322.3 583.4L320.5 586.3L319.3 585.5L318.5 588.5L316.2 591.1L310.5 593.3L309.4 591.5L309.8 588.5L308.6 587.9L308.4 585.6L306.6 583.6L307.8 580.1L306.9 578.5L307.1 573.5L309 570.2L307.9 566.6L298.2 562.3L294.8 562.7L291.6 565.7L289.6 566.1L291.8 563L292 558.1L295.7 557L296.1 555.7L303.8 561.9L311.8 563.2L312 564.4L313.8 564.4L316.8 567.3L321.3 567.9L323.4 572.1L327.6 575.5L327 576.3L323.8 572.8L322.3 572.8L322 573.9L324 575.3L323.4 576.5L325.1 575.5L327.3 577.7L324.7 577.2L325.3 578.9L327.3 578.4L327.8 576.3L332.5 578.9ZM294.2 552L295.7 554.7L295.4 555.6L293.3 553.1L294.2 552Z","c":[315.0,574.5]},{"n":"Antique","m":0,"d":"M310.5 593.5L311.2 602L317.5 610.3L317.7 616L316.1 616.5L315.2 618.5L314 618.3L313.9 620.4L310.5 621.9L309 626.6L302.6 631.2L299.9 637.8L299.5 643.4L300.5 644.2L296.4 647.6L293.6 645.2L293.7 641.7L296.3 639L297.5 631.5L294.2 626.2L297.8 616.1L301.9 610.1L300.7 600.6L301.8 596.3L300.3 594.1L302.2 591.3L301.8 583.9L303.8 581.8L304.6 570L302.6 567.6L299.5 567.8L293.9 565.9L289.6 566.2L291.6 565.7L292.5 564L295 562.6L298.9 562.5L307.9 566.6L309 570.2L307.1 573.5L306.9 578.5L307.8 580.1L306.6 583.6L308.4 585.6L308.6 587.9L309.8 588.5L309.4 591.5L310.5 593.5ZM265.2 559.9L270.2 560.3L271.2 561.4L270.4 562.4L264.4 561.9L265.2 559.9ZM272.7 554.4L274.3 557.7L272.4 558.5L271.7 555L272.7 554.4ZM265.2 550.2L262.9 553L260.9 548.7L261.9 548.6L262.5 547.8L261.5 547.9L260.3 546.7L260.8 544.8L262.9 544.6L264.4 546.1L263.2 547.4L265.2 550.2Z","c":[307.3,605.0]},{"n":"Capiz","m":1,"d":"M363 579.3L359.8 585.5L360 587.8L353.9 590.4L354.1 593.8L349.9 595L348.6 600.3L344.8 601L344 598.4L336.9 599.3L334.8 597.8L335.8 596L332.8 596.6L330.9 599.8L327.8 601.3L321.9 600.6L317.8 598.5L312.8 604L311.2 602L310.5 593.3L316.2 591.1L318.5 588.5L319.3 585.5L320.5 586.3L322.3 583.4L329.8 582.4L330.1 579.9L331.5 579.1L333 579L332.7 581.5L335 581.1L336.7 579.6L335.8 579.1L336.4 577.7L338.9 579.3L338.6 577.8L340.5 577.5L340.6 575.2L347.2 575.4L349.4 579.6L353.3 581L350.3 584.2L351.6 584.5L350.3 585.5L351.2 586.1L352.6 584.8L352.5 583L356.7 583L363 579.3Z","c":[336.3,589.6]},{"n":"Iloilo","m":1,"d":"M299.5 642.9L300.1 636.7L302.6 631.2L309 626.6L310.5 621.9L313.9 620.4L314 618.3L315.2 618.5L316.1 616.5L317.7 616L317.5 610.3L312.8 604L317.8 598.5L321.9 600.6L327.8 601.3L330.9 599.8L332.8 596.6L335.8 596L334.8 597.8L336.9 599.3L344 598.4L344.8 601L348.6 600.3L349.8 595.1L354.1 593.8L353.5 591L354.4 589.8L360 587.8L359.8 585.5L361.7 581.4L366.2 576.2L366.8 578.6L365.3 581.6L364.6 580.5L364.2 581.2L365.4 583.2L366.9 583.5L364.8 587.1L366.2 589.1L364.7 590.1L365 591.5L363.3 591.7L362.9 595.5L362.8 598.5L364.2 599.3L364.7 601.7L363.4 602.6L362 601.3L362.5 603.3L359.5 601.7L357.9 606.4L355.9 608.4L354.4 608.2L355.2 609.1L354.5 610L353.7 610.1L354 608.5L352.9 608L351.8 610.7L349.7 610.1L348.6 612.5L347.5 611.8L344.5 612.7L343.2 615.2L345 618L344.7 620.3L341.8 624.8L340.2 625.5L337.9 624.2L337.6 625.3L334.5 625.5L333.1 627.3L333.9 628.7L332.7 630.8L325.4 630.7L310.9 633.7L307.1 636.9L304.4 637.5L300.5 644L299.5 642.9ZM364.4 606L363.6 603.8L366.2 602.8L366.2 603.5L364.4 606ZM367.4 600.4L366.5 599.3L368.4 598.8L368.4 599.4L367.4 600.4ZM366.1 597.2L366.5 593.3L368.7 594.3L367.1 596.8L366.1 597.2ZM372 586.5L371.5 584.8L372 584L373.6 585.2L372 586.5ZM369 584L369 581.8L370.6 582.3L371 581.2L371.1 584.1L369 584ZM366.7 582.5L367.1 580.6L368.3 579.7L368.5 581.3L366.7 582.5Z","c":[334.8,610.1]},{"n":"Negros Occidental","m":1,"d":"M377 649.1L371.7 647.1L371.2 645.7L365.8 645.9L365 647.3L368.1 650.7L368 652.6L366.9 653.2L368.5 653.8L368.4 656.4L358.2 671.3L356.3 677.2L332.7 705.2L329.1 699.4L326.9 698.1L326.1 694.5L324.7 694.8L325.5 692.3L322.7 692.4L322.1 691.4L323.4 689.9L322 690.5L321.1 689.7L322.4 683.7L320.8 681.8L324.3 677.8L325.2 673.4L337.4 673.4L344.7 667.5L347 668.4L349.6 666.3L347.8 658.3L349.5 649.3L345.2 641L347 638.9L350.3 638.2L352.5 635.3L353.6 630.5L354.4 631.1L353.8 629.9L355.1 628.2L355.5 624.4L354.3 623.6L354.5 618.3L359.5 616.6L361.5 617.2L364.9 613.8L369.1 611.8L371.8 612.1L376 615.1L379.2 614.3L380.5 615.5L382.4 615L384.5 617.1L385.9 615.9L387.4 616.8L386.7 617.4L387.8 618L388.5 621.8L390.5 621.4L389.5 623.2L390.6 624.3L387.1 629.5L384.5 640.7L382.1 643.4L378.8 644.9L377 649.1Z","c":[357.3,658.6]},{"n":"Guimaras","m":0,"d":"M339.3 645.5L339.5 643.5L341.4 644.7L340 645L339.3 645.5ZM327.2 644.2L326.8 641.9L329.2 641.3L328.6 640L330.6 639.6L329.4 639.6L328.7 638L329.6 635.1L331.7 633.5L331.7 632L334.5 631.5L334.8 628.9L337.3 628L336.7 627L338.1 627.1L340.9 629.7L341.3 635L337.8 643.6L336.6 643.6L335.3 646L332.8 646.3L333.5 645.3L332.4 645L330.5 647.6L329.3 647.7L328.5 643.8L327.2 644.2Z","c":[334.4,637.2]},{"n":"Bohol","m":1,"d":"M406.3 693.4L408.4 694.4L408.3 695.7L404.2 698.9L401.4 699.2L401.2 697.6L399.4 696.7L406.3 693.4ZM432.9 661.6L435.3 662.6L435.9 664.5L437.6 662.8L438.7 665.9L440.3 665.9L443 668.2L444.9 668.6L445.5 667.4L447.9 669.5L449.3 673.4L447.7 673.4L448.4 676.3L447.4 676.7L449.7 677.2L448.7 679.6L446 681.1L450.9 683.7L450.6 686.6L449.4 688.1L446.4 688.7L444.3 686.3L442.1 688.7L439.8 689.4L439.3 692.8L431.1 696.1L426.8 695.4L419.2 696.6L407.3 693.8L406.8 692L408 689.1L406.2 687.4L403.4 687.6L404.3 681.5L408.3 678.6L408.9 676.3L409.5 677.4L413.4 674.6L417.5 674L419.6 667.9L421.7 668.2L424.8 662.8L432.2 662.7L432.9 661.6ZM452 662.8L450.2 665.4L451.2 665.1L451.3 666.8L448.8 666.5L448.3 668.7L447.2 668.7L446.6 665L448.3 665.1L448.4 664.1L449.6 665.3L449.9 663.7L452 662.8ZM431.1 659.6L429.8 661.3L427.5 660.8L427.8 660.2L431.1 659.6Z","c":[428.0,679.2]},{"n":"Cebu","m":1,"d":"M418.8 656.6L417.1 657.5L420.2 654.7L419.2 657.6L418.8 656.6ZM413.4 657.5L411.9 657L411.4 654.3L415.1 652L416.4 653.3L418.6 652L413.4 657.5ZM412 612.4L410.1 609.9L412.1 607.9L412 605.6L414.1 607.2L412.7 600.8L415.2 598.4L415.8 595.7L419.7 594.9L417.9 603.2L414.9 607.6L416.1 607.6L415.8 608.9L418.4 608.7L417.7 616.2L419.1 619.1L417.6 625L416.2 626.7L417.9 637.1L417.7 636.4L417 636.8L418 638.9L415.8 647.1L417.1 649L416 650.7L414.1 651L414.4 650.2L414.3 650L413.5 650.4L414.1 652.1L409.2 654.6L407.9 657.1L402.2 658.4L397.4 664.4L397.2 666.8L394.8 667L393.3 672.2L393.9 675L393 679.5L391 680.4L390.1 683L388.8 683.7L388.8 686.5L387.2 688.1L384.6 697.7L378.1 706.5L375 707L374.7 702.9L377.5 684.8L379.1 683L379 679.8L380.7 679.1L380.5 676L378.8 675.2L379.1 672.4L380.1 674.3L380.9 673.7L381.6 668.9L383.2 668.3L387.5 663.1L391.5 656.2L391.7 651.7L396.4 647.2L397.6 643.1L399.2 642.2L399 638L404.2 628.7L406 627.9L411.4 614.9L412 612.4ZM433.1 636.8L431.9 636.1L433.7 633.4L434.4 629.4L437.9 630.6L438.3 633.2L441.2 629L446.1 631.8L445.3 633.3L442.6 634.3L439.4 634.3L438.3 633.2L438.2 634.6L433.1 636.8ZM445.3 628.3L445.2 626.3L449.1 623.2L447.9 626.5L445.3 628.3ZM399.7 603.8L397.6 598.5L400.1 593.9L404.8 602.8L399.7 603.8ZM409.5 594.2L409.2 591.7L409.9 590.8L409.5 594.2Z","c":[403.1,651.0]},{"n":"Negros Oriental","m":1,"d":"M377 649.1L376.7 655.3L374 660.9L373.8 664.3L370.7 671.8L366.1 677.7L366.2 680.7L365 681.7L366.2 685.2L366.5 694.1L364.6 692.6L363.5 694.2L366.9 697.3L366.1 698.3L366.3 697.3L365.1 696.9L364.2 699.2L365.9 698.7L368.1 703.2L370.8 704.2L372.6 709.1L375.4 711.5L375.6 714L374 719.5L369.2 726.4L366.1 727.5L364.8 729.2L365 728.2L361.6 728L358.2 729.7L353.8 727.4L352 723.8L349.8 716.9L349.7 712.5L344.6 710L338.3 709.2L333.7 705.9L333.4 704.3L356.3 677.2L358.2 671.3L368.4 656.4L368.5 653.8L366.9 653.2L368 652.6L368.1 650.7L365 647.3L365.8 645.9L371.2 645.7L371.7 647.1L377 649.1Z","c":[357.0,687.7]},{"n":"Siquijor","m":0,"d":"M393.2 713.9L397.5 718.7L395.8 720.7L398.4 723.3L397.3 724.7L394.8 724.4L391.8 726.3L383.8 720.4L384.8 718.5L386.4 719.2L390.2 718.4L393.2 713.9Z","c":[390.1,720.1]},{"n":"Eastern Samar","m":0,"d":"M515 622.6L517.1 624.1L516.6 627.3L522 628.2L522 630.2L518.5 630.6L513.8 627.4L513.2 624.5L515 622.6ZM519.6 610.1L522.9 613.8L523.6 615.6L519.2 611.1L519.6 610.1ZM512 613.5L510.7 612.8L510.7 611.8L512.7 611.7L512 613.5ZM493.4 535.1L494.4 535.8L495.4 533.7L496.9 533.9L495.4 535.2L495.9 535.8L497.8 535.1L498.2 535.9L498.6 534.9L500.2 535.6L501.7 537.5L501.2 538.4L502.5 538.2L502.7 539.5L503.5 539.9L503.1 539L503.5 539L504.7 540.5L504.4 541.7L503.6 540.9L503.6 541.8L501.2 542L502.2 543.3L500.1 544.4L500.5 545.9L502.9 545.9L501.6 546.5L503.2 548.2L504.7 548.4L499.4 554.6L500 562.4L502.3 564.4L498.7 566.6L499.9 566.5L500.2 567.7L501.5 566.4L502.8 570.3L502.1 570.9L503.3 571.7L501 571.9L501.6 573.3L500.2 575.6L500.9 576.7L502.3 576.5L502 579.3L505.4 583.5L503.3 585.1L505.1 584.8L507.5 588.4L508.7 588.1L511.5 590.6L510.3 593.9L506.5 596.4L505.8 600.3L509.2 601.3L511.3 600.2L509.4 598.1L513.5 600.1L519 609.3L518.8 611.4L513.9 607L515.4 605.5L513 604.7L513.2 603.4L508.4 605.6L507.2 604.4L508 603L505.8 602.8L504.4 607.1L501.5 604.4L501.1 606.1L500 605.3L498.3 607.1L498.3 606L493.1 605L491.9 603.4L488.9 604.6L488.9 593.3L492.6 588.2L487.4 585.2L486.8 578.9L483.9 578.2L485 573.7L487.2 574.4L491.1 571.5L490.2 562.3L485.8 551.8L482.8 551.4L481.9 541.3L483.6 539.6L484.3 535L486.9 531.1L489.2 532.4L490.3 535.9L493.4 535.1Z","c":[496.6,571.2]},{"n":"Leyte","m":1,"d":"M484.7 636L479.5 638.7L479 640.5L469 641.8L467.3 647.5L469.2 655.3L466.3 656.7L463.6 660L460.1 660.8L462.2 652.9L458.8 649.4L458.1 642.9L460.8 639.8L461.3 633.7L462.4 633.7L463 632.3L461.8 625.5L456 615.7L450.8 611.2L447.4 613.3L448.2 616.2L446.1 619.9L443.9 620.1L442.4 618L441.1 618.5L441.7 617L440.3 614.9L440.1 615L440.3 616.4L440.2 617.3L437.9 616.6L440.2 612.8L439.3 611.9L439.8 609.8L437.5 608.2L439.4 605.4L438.4 599.8L439.5 597.6L437.9 595.5L438.7 594.1L437.4 594.7L437.7 593.7L436 593.2L435.9 590.2L437.1 590.1L435.2 589.2L435 588.2L436.4 587.7L434.5 587.2L432.9 582.4L432.6 580.2L434.3 578.2L439.9 583.4L443.7 589.4L443 585.3L444.1 584.3L447.4 586.5L448.2 591.6L450.2 593.7L457 593.7L463.2 588.9L463.7 586.1L467.5 587.5L467.5 585.5L468 585.9L468.2 587.9L468.3 588.1L468.6 588.2L468.8 586.7L469.5 587.5L471.1 586.3L471.9 588.4L473.3 588L472.3 595.2L473.3 596.8L475 596.9L475.6 599.5L476.3 597.7L474.9 602.5L476.8 608.2L476.5 616.1L474.7 621.2L475.1 626.5L476.9 629L481.4 630.2L481.1 632.4L484.7 636Z","c":[466.3,619.5]},{"n":"Northern Samar","m":0,"d":"M494.2 535.6L490.3 535.9L490.6 534.6L487.6 531L484.3 535L481.3 535L473 538.3L469 536.9L466.2 543.7L464.6 541.5L465.3 538.9L457.5 535.3L452.6 538.3L451.5 537.5L452 536.8L450.8 536.9L443.8 531.5L440.9 535L436.8 535.1L434.4 525.3L432.6 523.9L431.2 519L432.8 517L435.2 519.9L436.8 519.7L436.7 518.6L438.6 519.4L438.8 518L441 520.2L442.5 520L443.2 519.2L443.1 520.7L443.7 519.8L445.9 520.8L448.8 520L455.5 521.5L462.7 519.4L466.3 520.1L467.6 518.1L466.2 516.9L469.3 518L471.9 517L473 519L475.2 518.1L476.1 520.2L479.2 519.6L478.7 517.3L480.3 517.1L481 518.2L483 516.9L490.2 522.7L489.6 523.6L491.5 523.9L492.5 527.1L493.2 527.1L494.4 527.7L492 528L493 528.8L491.2 530.7L491.5 532.2L493.2 532.3L491.3 533.6L491.7 534.6L494.3 533L494.2 535.6ZM430.4 524.4L432.3 527.1L432.1 530.2L430.5 527.8L430.4 524.4ZM424.7 527.4L423.7 524.7L424.2 523L427.1 527L427.1 528.6L424.7 527.4ZM442.5 519.4L440.1 518.6L440.6 517.2L442.5 518.4L442.5 519.4ZM443.6 517.3L445.3 517.5L446.4 519.4L445.2 519.6L443.6 517.3ZM475.4 516.3L478.6 517.8L477.3 518.9L474.7 517.7L473.8 513.5L475.4 516.3ZM439.3 516.7L436.8 516.1L436.9 514.3L439.3 516.7ZM478.2 510.8L478.8 514.7L479.7 515.8L476.4 514.8L478 513.8L476.2 513L476.3 511.7L478.2 510.8ZM437.2 512.2L436.8 510.2L438.8 511.6L439 513.5L437.2 512.2Z","c":[463.8,530.3]},{"n":"Samar","m":1,"d":"M457.3 569.5L458.6 569.4L458.5 568L460.1 571.5L461.8 570.6L460.8 571.8L463.2 573.3L462 574.8L462.5 576L465.7 576L464.1 580.2L462.2 579.1L463.2 578.1L460.8 577.5L460.5 575.4L462.3 575.9L459.8 572.9L459.3 573L459.4 573.3L459.1 573.6L457.3 569.5ZM467.6 574.5L464.8 574L464.1 569.4L465.5 570.9L466.4 570.5L466.6 570.9L466.2 571.3L466.3 571.5L468.3 571.7L466.9 573.1L467.6 574.5ZM481.9 541.3L482.8 551.4L485.8 551.8L490.2 562.3L491.1 571.5L487.2 574.4L485 573.7L483.9 578.2L486.8 578.9L487.4 585.2L492.6 588.2L488.9 593.3L488.2 606.8L486.7 606.1L485.9 601L483.3 595.5L478.6 594.8L474.8 595.9L473.2 594.9L474.3 586.4L468.8 583.8L468.3 581.4L468 584.2L465.1 584.1L464.1 582.6L465.1 579.7L468.3 579.7L467.5 577.4L471.8 577.6L472 576.2L474.1 575.1L472.9 571.8L476.2 567.9L476.9 568.5L477 566.9L474.3 565.2L469.1 567.6L466.2 564.6L466.2 563.2L465 563.1L465.1 563.9L464.5 564.3L464.9 562.2L462.6 560.5L461.4 560.4L461.3 560.2L462.7 559.8L461.4 559.3L462.8 558.7L462.1 557.8L464.2 559L463.4 557.6L462.2 557.2L459.1 558.2L459.5 556.2L456.7 554.7L456.4 551.4L453.1 548.8L447.3 548.5L445.2 547L442.2 542.7L438.8 540.3L436.8 535.1L440.9 535L443.8 531.5L450.8 536.9L452 536.8L451.5 537.5L452.6 538.3L457.5 535.3L465.3 538.9L464.6 541.5L466.2 543.7L469 536.9L473 538.3L481.3 535L484.3 535L483.6 539.6L481.9 541.3ZM460.7 570.1L459.7 569.5L459.6 567.7L461.5 568.4L460.7 570.1ZM443.3 558.5L440 558.2L441.9 556L443.3 558.5ZM433.2 558.3L431.9 557.3L432.3 556.3L435.4 554.4L435.7 555.7L433.2 558.3ZM439.9 554.4L439.5 552.9L441.1 552.7L441 554.6L439.9 554.4ZM426.1 550.1L424.4 549.3L424.7 548.2L429.8 547.1L429.8 548.5L428.5 548L426.1 550.1Z","c":[483.2,569.2]},{"n":"Southern Leyte","m":1,"d":"M489.5 677.2L485.1 669.4L482.4 668.3L481.4 662.4L486.9 664.3L490.9 672.3L491.5 677.2L489.5 677.2ZM484.7 636L485.7 637.3L484.1 640L485.7 643.5L485 646.2L487.1 648.9L488.5 648.3L489.6 649.7L490.2 654.1L489.3 656.5L487.1 657.2L482.2 655.4L482.7 661.7L481.8 662.3L479 658.3L475.9 649.9L472.7 649.4L473.1 659.2L475.9 666.6L476 671.7L468.9 666.6L467.8 664.6L461.5 664L460.1 660.8L463.6 660L466.3 656.7L469.2 655.3L467.3 647.5L469 641.8L479 640.5L479.5 638.7L484.7 636Z","c":[483.6,653.8]},{"n":"Biliran","m":1,"d":"M438.8 576L435.5 571.8L435.8 571.1L440.9 569.6L447.3 571.4L450.1 578L452 579.4L451.4 582.7L449.6 583.7L445.3 583.2L443.6 584.3L438.7 578.4L438.8 576ZM434.9 566.4L433 564.8L434.5 563L436.4 563.8L436.3 565.6L434.9 566.4Z","c":[444.3,576.9]},{"n":"Zamboanga del Norte","m":1,"d":"M390.1 775.8L377.7 778.7L372.4 777.7L371.1 776.3L369.9 780.8L366.8 785.3L367.9 787L366.3 789.1L368.1 789L367.5 791.2L362 792.5L355.9 796.9L342.4 794.9L341 798.3L338.2 799L335.5 795.5L333.8 796.9L332.7 796.3L331.4 798.4L326.9 799L326.5 800.6L322.5 799.8L320.7 803.7L322.8 805.9L320 806.8L313.9 821.7L314.6 822L309.2 827.1L308.2 830L308.9 836L307.3 836L306.7 838.8L303.2 843L293.6 843L297.1 837.2L302.4 834.6L302.6 833.2L300.9 832.4L300.6 830.6L302.1 828L302 825.1L304 822.2L303.1 820.6L304.6 820.6L307.1 817.6L304.9 816.2L306.6 811.9L305.5 808.4L303.8 807.8L304.8 806.3L306.1 806.6L304.7 805.4L304.9 804.7L305.8 805.4L308.1 800.4L311.5 798.2L312.4 796.4L311.7 794.8L314.4 792.2L326 787.6L332.9 787L337.5 782.3L338.9 784.7L342.3 785.4L352.8 782.9L357.1 779.1L357 776.9L355.4 776.4L353.6 773.6L356.3 772.3L356.1 767.2L358.4 765.4L358.8 763L361.1 761.1L368 760L373 761.3L375.1 760.7L377.9 753.9L381.6 753.8L382 752.2L380.6 751.5L381.1 750.3L380.4 751L379.6 748.4L382.9 749.1L383.8 750.9L386.7 749.9L385.9 753.5L387.4 754.8L389.8 754.8L390.1 775.8Z","c":[323.8,796.0]},{"n":"Zamboanga del Sur","m":1,"d":"M310.5 856.8L311.3 853.2L314.7 852L315.5 853.3L314.7 854.5L312.8 854.3L310.5 856.8ZM319.4 824.6L318.9 828.2L321.8 828.6L318.7 833.2L317.8 833.6L318 832.2L317 832.9L317.3 831.9L315.8 832.5L315.1 838.1L313.3 839.6L314.3 840.3L313.2 840.7L313.8 845.3L310.7 847.9L311.2 849.2L310.3 849.6L311.2 849.9L309.6 854.9L307.6 856.2L308.1 857L305.3 858.7L295.7 854.7L292.8 847.5L293.1 843L303.2 843L306.7 838.8L307.3 836L309.1 835.6L308.2 830L309.8 826.2L315.3 821.2L316.9 823.5L319.4 824.6ZM390.1 775.8L390.1 790.4L394.6 790L394.5 791.6L394.9 791.8L395.5 790.9L396.2 792.1L394.8 792.7L395.4 794.4L394.5 796L396.2 796.7L395.3 798.5L396.4 798.7L394.4 799.9L393.7 802.3L388.9 801L384.3 803.3L382.1 803.1L381.9 805.9L385.6 808.3L385.3 811.9L384.5 814.2L379.9 815.6L380.1 818.6L378.2 817.2L377 818.9L379.7 819.9L380.4 824.5L381.5 824L383.8 825.9L382.8 827.4L383.8 829.7L381.1 830.5L374 824L374.9 820.1L370.5 819.6L367.9 821.7L368.9 822.9L367.7 824L367.1 822.3L364.1 821.2L363.3 818.6L365 817.2L364.4 816.7L363 816L363 815.8L364.7 815.8L365.4 817.4L368.9 816.5L367.6 813.3L365.5 813.4L365.8 812.6L364.8 812.4L365.8 810.1L364.2 807.9L362.3 810.1L362.5 806.1L363.6 805L362.8 803.1L361.2 803.8L358.5 802.8L356.4 803.9L357.6 803L356.3 802.8L356.5 801.2L352.2 799.2L352.7 796.7L355.9 796.9L362 792.5L367.5 791.2L368.1 789L366.3 789.1L367.9 787L366.8 785.3L369.9 780.8L371.1 776.3L372.4 777.7L377.7 778.7L383.4 778L389.1 775.7L390.1 775.8Z","c":[372.4,803.1]},{"n":"Zamboanga Sibugay","m":1,"d":"M347.5 835.4L346 834.2L346.3 831.5L344.9 831.3L345.9 826.5L347.1 825.7L348.4 826.5L350 830.1L351 829.3L351.3 825.4L353.2 826.3L354.2 827.5L353.4 828.2L355.8 830.3L352.9 829.7L354.6 831.1L354.4 831.7L352.5 831.1L351.3 832.9L348.4 833.4L347.5 835.4ZM352.6 795.7L352.2 799.2L356.5 801.2L356.3 802.8L357.6 803L356.4 803.9L358.5 802.8L361.2 803.8L362.1 802.7L363.6 805L362.5 806.1L362.3 811.4L359.3 812.6L360.5 812.8L360.7 814.4L358.9 814.4L359.3 817.8L356.9 824.5L355.9 822.8L354.4 823.3L351.7 819.3L350.6 821.5L349 822.1L350.1 823.8L348.1 825.8L347.5 825.2L346.2 825.8L346 822.5L344.5 823.8L344.9 819.7L347.3 820.7L346.4 817.4L344.9 816.5L345.5 813.8L344.6 811.5L346.5 807.6L344.9 806.3L342.4 807L340.9 804.9L339.3 804.7L338.3 806L337.3 804.8L330.6 807.9L327 812.8L327.4 814.1L323.9 817.1L325.2 818L328.4 817.3L325.2 821.9L324.2 822L326.1 819.7L325 819.1L323.5 821.8L320.8 822.7L319.4 824.5L316.9 823.5L315.6 821.2L313.9 821.7L319 808.5L320 806.8L322.8 805.9L320.7 803.7L322.5 799.8L326.5 800.6L326.9 799L331.4 798.4L332.7 796.3L333.8 796.9L335.5 795.5L338.2 799L341 798.3L342.4 794.9L352.6 795.7Z","c":[353.8,810.4]},{"n":"City of Isabela (Not a Province)","m":0,"d":"M300.7 867.6L300.5 870.5L301.7 871.5L300.3 875L301.3 878.1L295 878.1L295.4 875.1L293.8 873.7L293.9 871.5L294.7 872L298.7 867.7L300.7 867.6ZM298.2 867.3L297 869.3L295.2 869.3L296 867.4L298.2 867.3Z","c":[297.4,872.8]}]},"history":{"first":"2020 Q3","provinces":{"Abra":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1111100000100001111111","mu":[4,8,6,5,6,0,0,1,0,0,4,0,0,0,0,3,4,4,7,5,3,4],"p":[80.6,51.3,89.7,85.1,82.1,32.5,38.3,37.3,40.8,5.8,23.6,68.4,34.2,6.3,22.9,57.3,81.4,40.9,79.8,82.0,81.9,39.7]},"Agusan del Norte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0100110110000001100010","mu":[0,6,0,1,5,2,0,3,3,0,0,0,0,0,0,3,4,0,1,1,2,0],"p":[73.1,21.5,80.7,18.0,44.3,38.5,51.9,15.1,54.2,20.7,15.7,8.0,15.4,4.6,14.3,16.2,81.8,53.7,27.6,20.0,39.9,36.5]},"Agusan del Sur":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1101110110000001100110","mu":[7,3,1,2,6,2,0,2,8,0,0,1,0,0,0,8,7,0,0,2,3,1],"p":[78.4,67.8,85.0,25.5,68.1,45.5,60.3,20.0,63.0,40.8,20.8,10.6,26.6,7.1,20.4,20.5,90.8,66.1,35.7,22.4,59.1,46.9]},"Aklan":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000000100000","mu":[4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,0,0,0],"p":[60.6,20.4,18.6,6.0,11.3,2.9,7.1,5.5,8.7,1.7,4.3,2.7,5.2,1.1,4.0,11.3,17.1,14.7,9.1,7.3,18.1,3.2]},"Apayao":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1101100000000000100111","mu":[7,2,1,2,2,0,1,0,0,0,0,1,0,0,0,0,4,0,0,2,5,2],"p":[80.9,41.4,71.8,65.8,77.1,21.9,19.6,33.6,22.3,3.6,12.0,20.1,41.6,4.4,11.5,34.9,51.5,45.4,30.3,29.4,80.3,44.1]},"Batangas":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1111110100000000101100","mu":[11,5,12,4,4,2,1,3,0,0,0,0,0,0,0,0,8,0,7,4,0,1],"p":[78.0,50.2,77.2,68.2,77.4,36.8,61.7,41.3,69.2,5.9,16.2,13.5,20.1,4.4,14.3,35.0,44.3,58.0,29.9,65.9,72.6,19.1]},"Biliran":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000000100000","mu":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,1,1,1,0],"p":[23.2,16.8,26.8,8.6,14.6,7.3,16.8,11.7,18.2,4.2,10.6,6.3,7.1,1.7,10.5,13.8,28.9,28.9,13.5,8.8,24.8,9.2]},"Bohol":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000111100110000","mu":[0,0,0,0,0,0,0,0,0,0,5,2,8,3,0,0,7,3,1,1,1,0],"p":[40.5,12.1,29.5,22.6,37.1,14.6,27.7,12.2,19.6,5.0,11.6,29.8,59.0,14.3,23.5,15.2,35.4,60.3,58.0,24.3,39.6,17.5]},"Bukidnon":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1011111000000011111001","mu":[20,0,9,9,19,8,9,0,0,0,0,0,0,0,7,5,5,4,4,1,0,4],"p":[94.6,69.3,47.4,73.4,75.2,63.2,75.7,68.3,32.0,8.4,23.1,13.0,21.2,7.1,23.1,58.2,82.0,62.6,51.3,50.2,39.7,17.4]},"Cagayan":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1011111110000010111111","mu":[14,1,14,3,8,3,18,12,7,0,0,0,0,0,9,0,16,2,7,10,7,2],"p":[94.3,78.1,62.1,87.7,89.3,66.9,85.1,89.9,86.5,53.4,20.0,20.3,27.5,5.2,20.2,88.7,61.5,82.3,74.1,90.0,88.8,69.9]},"Camarines Sur":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1110000000000011101010","mu":[6,3,4,1,0,0,0,0,0,0,0,0,0,0,2,3,9,1,2,0,2,0],"p":[62.3,56.8,57.3,45.3,40.4,8.0,21.6,16.6,22.9,4.5,12.7,9.2,14.6,3.2,13.0,46.1,76.4,63.7,29.1,37.5,28.9,27.1]},"Capiz":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000000100000","mu":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,1,0],"p":[26.5,15.5,15.7,5.0,9.4,2.4,5.9,4.5,7.2,1.4,3.6,2.2,4.3,0.9,3.3,9.4,14.4,34.4,7.6,4.8,15.3,4.7]},"Cavite":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1111100100000000101110","mu":[7,3,4,4,6,0,0,3,0,0,1,0,0,0,0,0,6,0,5,6,2,0],"p":[67.4,45.9,74.1,59.4,75.7,36.5,40.3,35.7,65.2,6.3,17.7,16.7,19.3,4.3,16.8,36.6,43.5,51.4,32.6,65.2,74.6,25.8]},"Cebu":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0011110000111000111110","mu":[0,0,16,10,2,10,0,0,0,0,4,2,13,0,0,0,9,12,9,5,7,1],"p":[56.5,19.8,43.8,71.4,69.1,37.0,56.6,21.3,32.3,8.7,19.6,58.9,75.7,30.0,28.8,26.6,52.2,86.4,79.2,45.9,65.7,39.2]},"Davao de Oro":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000010100111","mu":[4,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,6,1,0,3,2,2],"p":[73.6,39.7,29.8,13.9,21.9,8.6,19.8,11.4,18.8,4.7,11.9,6.3,11.3,3.3,20.2,45.2,28.3,47.0,42.9,20.5,56.6,36.2]},"Davao del Norte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000100110011","mu":[3,0,0,0,0,0,0,0,0,0,0,0,0,6,1,0,4,4,0,0,3,3],"p":[75.8,42.0,30.6,15.0,22.5,8.4,20.4,11.9,19.3,4.6,12.5,6.3,11.4,3.5,48.3,22.8,29.3,47.9,52.1,22.0,33.3,40.9]},"Davao del Sur":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000110001110","mu":[4,0,0,0,0,0,0,0,0,0,0,0,0,3,2,0,1,0,5,3,3,1],"p":[79.4,46.9,31.1,14.5,21.4,7.8,20.2,11.9,18.2,4.4,11.9,6.3,10.6,3.2,39.5,38.8,26.0,18.0,33.5,33.3,62.3,30.5]},"Davao Oriental":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000000000110","mu":[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,2,2,0],"p":[65.9,22.5,21.0,9.2,14.2,4.6,13.3,8.1,12.0,2.5,7.8,4.4,6.7,1.8,12.1,12.2,24.0,20.2,23.0,14.4,44.3,20.4]},"Ifugao":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1111100000111011111111","mu":[4,8,3,6,4,0,0,0,1,0,2,2,3,0,2,5,9,5,7,3,5,3],"p":[92.5,74.5,92.1,88.4,89.0,52.6,43.8,36.9,39.9,11.7,29.4,63.8,52.0,17.0,27.2,60.6,92.9,79.2,86.8,85.7,88.9,71.1]},"Ilocos Norte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1100100000000000000000","mu":[6,2,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"p":[69.8,13.1,59.2,12.8,29.0,7.2,12.8,13.4,12.2,1.7,7.0,8.6,8.1,1.1,7.3,23.7,17.9,7.4,12.7,15.0,17.3,3.4]},"Iloilo":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000010100000","mu":[2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,11,0,1,0,1,0],"p":[69.3,23.2,20.6,6.2,12.0,3.3,7.9,5.5,9.3,1.9,4.7,2.8,5.7,1.2,4.4,14.5,18.3,45.6,10.5,9.8,18.9,6.0]},"Isabela":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1111111110000011111111","mu":[22,3,11,7,20,15,17,17,12,1,0,0,0,0,9,20,20,15,15,19,9,13],"p":[95.7,79.2,79.0,91.6,94.6,77.5,91.4,91.4,91.5,59.7,31.9,27.2,32.3,6.1,24.9,88.1,94.8,82.9,90.1,90.0,94.1,73.0]},"Kalinga":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1011100000000000101110","mu":[3,1,2,3,5,0,0,0,0,0,0,0,0,0,0,0,4,1,3,3,3,1],"p":[83.6,40.8,59.0,68.2,69.5,22.7,20.7,20.3,21.2,3.8,12.9,21.3,27.6,4.5,11.8,37.0,49.7,52.8,44.9,63.3,75.4,38.5]},"Laguna":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1111111100000010001100","mu":[2,3,12,6,4,2,3,3,0,0,0,0,0,0,2,0,1,0,3,2,0,0],"p":[81.1,51.6,77.2,69.2,78.0,35.9,63.3,63.5,72.1,7.0,18.7,15.7,23.0,5.2,16.6,59.1,48.6,33.3,33.7,62.5,72.9,21.9]},"Lanao del Norte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000100000000000100000","mu":[4,0,0,0,3,0,0,0,0,0,0,0,0,0,1,0,2,0,0,0,0,1],"p":[71.0,25.9,20.6,16.2,22.4,20.0,19.3,13.9,12.5,2.5,7.6,4.0,7.6,1.9,7.8,15.1,31.4,21.6,23.1,16.9,15.2,5.3]},"Leyte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1100111111100111100111","mu":[9,3,1,0,3,2,8,8,9,10,3,0,0,6,9,7,17,0,1,4,6,2],"p":[59.2,79.2,88.0,39.5,48.2,64.3,75.5,71.8,83.0,50.7,71.1,52.2,29.2,8.8,66.6,71.5,79.1,77.1,47.3,36.3,79.0,46.0]},"Maguindanao del Norte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000010000100","mu":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,1,1,0,2,0,0],"p":[22.0,8.5,18.8,10.3,12.5,3.8,11.8,9.0,10.7,2.0,7.1,4.3,5.6,1.5,7.4,29.9,26.0,7.0,33.2,15.7,51.0,7.0]},"Maguindanao del Sur":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000000001011","mu":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,3,0,5,5],"p":[24.7,10.7,20.8,11.2,14.5,4.8,13.6,9.4,12.1,2.7,7.6,4.7,6.6,2.1,7.9,16.1,29.4,14.3,23.0,31.1,22.5,27.7]},"Marinduque":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1001000000000000000000","mu":[5,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],"p":[30.0,19.5,15.4,15.1,36.7,6.2,9.5,11.7,16.9,3.5,5.7,6.5,6.5,1.6,5.3,7.5,25.6,10.7,11.4,8.0,14.5,4.4]},"Masbate":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1000000000000000100010","mu":[5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,1,3,0],"p":[74.2,34.9,25.5,13.5,13.9,4.2,10.3,7.0,11.4,2.5,6.2,3.8,6.7,1.7,6.1,12.0,25.3,46.0,12.8,13.0,16.0,17.4]},"Misamis Occidental":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1001010000000000000000","mu":[5,0,0,5,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"p":[60.1,26.5,19.9,13.8,33.2,8.5,34.3,11.3,12.1,2.8,6.8,3.5,7.1,2.0,6.8,10.8,26.6,11.9,22.9,12.7,15.2,5.8]},"Misamis Oriental":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1010111000000001100000","mu":[3,0,7,0,4,5,3,0,0,0,0,0,0,0,0,2,6,0,0,0,0,0],"p":[87.0,27.8,31.9,52.8,34.9,32.8,55.5,48.4,21.5,4.8,13.9,7.2,12.8,4.0,13.2,24.3,75.9,48.9,35.1,25.7,24.7,10.6]},"Mountain Province":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1101000000000000000000","mu":[2,3,1,2,1,0,1,0,0,0,0,0,0,0,0,1,1,1,0,1,1,0],"p":[69.8,21.2,63.6,45.2,58.5,12.1,12.5,10.3,10.9,2.0,7.1,11.3,13.7,2.4,6.4,18.4,51.3,22.9,29.1,17.0,47.2,20.7]},"Negros Occidental":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000000100000","mu":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,3,0,0,0,0,0],"p":[26.1,10.6,14.6,7.2,20.1,5.9,13.3,6.1,10.0,1.9,5.1,5.3,6.7,2.3,5.1,8.8,39.4,15.5,18.2,7.3,20.6,6.4]},"Negros Oriental":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0001110000101000110101","mu":[0,0,0,4,7,2,0,0,0,0,2,1,6,0,0,0,10,7,1,4,1,2],"p":[51.3,14.1,36.6,20.3,55.7,30.4,44.0,16.9,26.6,6.1,15.4,24.0,68.0,14.6,15.6,21.9,46.7,71.5,55.2,21.5,58.7,21.4]},"North Cotabato":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1100001000000000000000","mu":[2,4,1,0,0,0,2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],"p":[80.5,23.3,59.1,14.6,11.9,3.9,11.4,18.5,10.0,2.0,6.5,3.5,5.4,1.5,6.6,11.4,46.5,8.7,12.8,8.0,12.1,4.2]},"Nueva Vizcaya":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1010111110000001101111","mu":[4,0,8,1,4,2,5,7,3,0,0,0,0,0,1,4,7,0,2,5,3,3],"p":[93.6,68.7,55.9,85.0,64.5,56.4,82.0,81.3,86.2,46.9,22.3,20.6,24.5,5.3,20.6,69.4,89.1,74.1,48.7,78.7,89.6,64.7]},"Oriental Mindoro":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1001101110000000000000","mu":[3,0,1,4,2,1,4,5,2,0,1,0,0,0,1,0,1,0,0,1,1,0],"p":[71.7,28.0,23.7,31.1,61.8,23.1,17.7,40.2,64.2,12.4,9.4,14.2,12.2,2.7,8.6,17.8,39.8,15.4,19.0,13.9,24.8,8.3]},"Palawan":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1010100100000000000000","mu":[9,0,2,0,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"p":[64.5,34.9,21.1,31.8,25.2,28.0,12.5,14.1,38.7,4.8,7.3,8.1,8.2,1.9,7.0,10.8,31.4,7.2,15.9,10.1,16.8,5.7]},"Pampanga":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000001000000000011000","mu":[0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,0,2,3,0,0,0],"p":[30.3,4.0,16.0,12.8,20.3,2.9,11.7,33.6,13.0,1.5,6.0,7.9,7.3,1.1,6.0,14.1,36.4,4.3,30.1,43.1,18.8,3.4]},"Pangasinan":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0001000000000010100000","mu":[0,1,0,2,1,0,0,0,0,0,0,0,0,0,2,1,2,0,0,1,0,0],"p":[58.5,6.4,48.9,14.1,34.5,4.9,14.2,11.9,11.9,1.5,8.0,8.8,6.7,0.9,7.2,38.7,32.4,19.4,12.8,13.2,24.9,3.1]},"Quezon":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1011111100000010101100","mu":[16,1,14,5,2,3,3,4,0,0,0,0,0,0,3,0,18,0,2,3,0,0],"p":[62.8,58.4,61.4,68.4,77.5,43.1,68.4,56.6,73.0,6.6,16.6,12.8,19.4,4.9,15.9,52.8,41.9,64.6,30.2,56.1,75.8,20.7]},"Quirino":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1011111110000001111111","mu":[5,0,5,3,6,5,7,4,7,1,0,0,0,0,1,4,11,4,4,5,6,2],"p":[94.7,74.1,55.3,89.4,90.7,72.2,83.2,83.4,78.3,50.8,40.9,20.6,22.3,4.9,20.3,80.6,88.7,80.8,83.3,87.6,86.9,72.5]},"Rizal":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1010000000000000001001","mu":[2,1,2,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,4,0,0,2],"p":[41.6,34.2,42.3,43.1,38.1,9.6,35.2,22.6,29.0,3.3,10.2,8.8,12.2,2.4,9.1,24.0,30.2,16.3,19.6,48.7,36.0,11.8]},"Romblon":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0010000100100001000000","mu":[0,0,3,0,0,0,0,5,0,1,3,0,0,0,0,4,1,0,0,0,0,0],"p":[37.6,11.9,22.3,35.1,26.2,8.2,13.4,14.7,43.7,4.8,10.1,11.5,8.0,2.0,7.4,9.4,37.8,9.4,16.1,10.3,17.8,5.8]},"Samar":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0100010111000000000000","mu":[0,3,0,0,0,6,1,3,4,4,1,0,0,0,0,0,0,0,0,0,0,0],"p":[32.8,15.8,67.3,14.4,22.4,11.9,56.9,23.6,53.5,19.9,41.4,12.3,11.4,3.0,17.3,21.7,40.1,17.0,21.4,13.6,32.5,13.4]},"Sarangani":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000000000000","mu":[1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0],"p":[58.0,6.5,26.7,7.2,6.0,1.9,6.4,6.6,5.7,1.3,3.5,2.1,3.0,0.8,3.7,10.4,16.0,13.4,7.4,4.2,6.9,2.2]},"South Cotabato":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1100001000000011100000","mu":[7,6,1,0,0,0,2,0,0,0,0,0,0,1,3,5,3,1,1,0,0,0],"p":[79.3,34.1,66.7,19.0,16.7,5.5,16.5,24.3,14.3,3.6,9.0,5.4,8.4,2.7,15.2,57.1,58.6,30.7,24.7,18.8,17.5,6.7]},"Southern Leyte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1100111111100110100000","mu":[3,5,0,0,4,4,5,8,7,2,2,0,0,2,2,1,3,0,0,1,1,0],"p":[46.8,60.6,87.0,24.1,37.9,51.3,73.4,53.7,74.4,42.0,59.4,31.6,21.4,6.4,47.4,49.1,55.6,59.2,36.8,22.4,51.8,28.7]},"Sultan Kudarat":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1110001000000010000000","mu":[7,4,2,0,0,0,2,0,0,0,0,0,0,0,3,0,1,0,0,0,0,0],"p":[75.2,33.8,61.2,23.4,15.9,5.4,15.1,44.1,14.1,3.3,8.6,5.2,7.3,2.3,9.3,32.4,31.7,28.6,17.3,11.0,16.8,6.4]},"Surigao del Sur":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1101100000000000000000","mu":[6,9,0,7,6,1,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,1],"p":[66.3,39.7,64.5,9.6,51.1,23.3,27.0,8.3,21.0,6.9,8.5,4.2,8.3,2.6,8.1,8.1,35.4,18.6,17.1,10.1,24.4,11.4]},"Tarlac":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000001001000","mu":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,1,3,0,0,0],"p":[47.7,2.8,15.0,10.6,15.2,2.0,9.6,15.6,9.6,1.1,5.0,7.0,5.8,0.8,4.9,13.3,71.0,3.2,24.7,50.4,13.6,2.4]},"Zamboanga del Norte":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0100000000000000100000","mu":[0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0],"p":[74.5,5.6,54.1,5.3,8.3,2.8,6.8,4.4,7.0,1.5,3.8,2.2,4.1,1.1,4.1,4.7,11.9,16.8,8.6,5.0,9.1,3.1]},"Zamboanga del Sur":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"1100000000000000100000","mu":[11,11,0,0,0,0,0,0,0,0,0,1,1,0,1,1,7,1,0,1,0,0],"p":[86.1,22.9,59.3,6.9,10.0,3.1,8.1,6.0,8.5,1.7,4.8,2.8,20.9,2.5,5.1,8.6,29.8,20.1,12.0,6.9,13.2,3.4]},"Zamboanga Sibugay":{"t":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],"y":"0000000000000000100000","mu":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0],"p":[67.4,5.2,17.9,5.3,7.9,2.4,6.9,4.6,6.5,1.4,4.0,2.4,4.2,0.9,4.8,5.0,9.0,12.9,8.3,5.4,7.8,2.6]}}}}</script>
 <script>
 (function(){
   "use strict";
   let M = JSON.parse(document.getElementById('model-data').textContent);
+  const A = JSON.parse(document.getElementById('app-data').textContent);
   const $ = id => document.getElementById(id);
-  const state = { mode:'q', q:1, lagY:0, nbR:0 };
+  const state = { mode:'q', q:1, lagY:0, nbR:0, view:'forecast', layer:'risk', sel:null, showLow:false, hi:null };
   const qNames = {1:'Q1 (Jan–Mar)',2:'Q2 (Apr–Jun)',3:'Q3 (Jul–Sep)',4:'Q4 (Oct–Dec)'};
   const tierClass = n => 't-' + n.replace(/\s/g,'');
+  const tierVar = {Low:'--r-low', Moderate:'--r-mod', High:'--r-high', 'Very High':'--r-vhigh'};
+  const mapVar = {Low:'--m-low', Moderate:'--m-mod', High:'--m-high', 'Very High':'--m-vhigh'};
   const fmtPct = p => (p*100).toFixed(1);
+  const qlabel = t => `${2020 + Math.floor((t-1)/4)} Q${(t-1)%4+1}`;
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let H = null, OUT = null;
+  const FARM = {
+    'Low': { when:'Check your field once a week.', steps:[
+      'Check your field once a week (50 plants, see the Guide).',
+      'Remove weeds and keep the field clean.',
+      'Crush any egg clusters you find under the leaves.'] },
+    'Moderate': { when:'Check your field twice a week.', steps:[
+      'Check your field twice a week, especially young corn.',
+      'Crush egg clusters and pick off worms by hand.',
+      'Ask your MAO about pheromone traps and natural enemies like earwigs and Trichogramma.'] },
+    'High': { when:'Check your field every 2 to 3 days.', steps:[
+      'Check your field every 2 to 3 days.',
+      'If many plants have fresh damage, report it to your MAO right away.',
+      'Ask your MAO which spray to use. Use only approved products and follow the label.'] },
+    'Very High': { when:'Check your field every day or two.', steps:[
+      'Check your field every day or two. Look inside the whorl.',
+      'Report any damage to your MAO now, and warn nearby farmers.',
+      'Work with your neighbors and the MAO to control the worms at the same time.',
+      'If you spray, wear gloves, a mask and long sleeves.'] }
+  };
+  const stepsHTML = (t, n) => FARM[t.name].steps.slice(0, n || 9).map(x => `<li><span>${x}</span></li>`).join('');
 
   function sigmoid(z){ return 1/(1+Math.exp(-z)); }
-  function tierOf(p){ return M.tiers.find(t => p < t.max); }
+  function tierOf(p){ return M.tiers.find(t => p < t.max) || M.tiers[M.tiers.length-1]; }
+  function tierRange(t){ const i = M.tiers.indexOf(t), lo = i ? M.tiers[i-1].max : 0; return i === M.tiers.length-1 ? `${Math.round(lo*100)}% and above` : (i === 0 ? `below ${Math.round(t.max*100)}%` : `${Math.round(lo*100)}–${Math.round(t.max*100)-1}%`); }
 
-  // Compute z and per-factor contributions (relative to the training average)
+  // ---------- model
   function score(mode, inp){
     const m = mode === 'q' ? M.quarterly : M.monthly, c = m.coef, mu = M.means;
     const x = {
@@ -330,6 +652,20 @@ footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);paddi
     return { z, p: sigmoid(z), contrib };
   }
 
+  function outlook(){
+    if (OUT) return OUT;
+    const L = M.latest, fq = +L.forecast_for.slice(-1);
+    OUT = Object.entries(L.provinces).map(([p, v]) => {
+      const r = score('q', { province:p, known:true, region:M.province_region[p], q:fq, lagY:v.lagY, nbR:v.nbR, area:v.area, nat:L.national_reports, tmin:v.tmin, rain:v.rain, hum:v.hum });
+      return { p, reg: M.province_region[p], v, prob: r.p, t: tierOf(r.p) };
+    }).sort((a,b) => b.prob - a.prob);
+    OUT.forEach((x,i) => x.rank = i+1);
+    return OUT;
+  }
+  const outOf = p => outlook().find(x => x.p === p);
+  function pastShare(p){ const h = H.provinces[p]; if (!h) return null; const n = h.y.length, k = [...h.y].filter(c => c === '1').length; return { k, n, s: k/n }; }
+
+  // ---------- forecast view
   function readInputs(){
     const pv = $('prov').value, other = pv === '__other';
     const region = other ? ($('regOther').value === '__none' ? null : $('regOther').value) : M.province_region[pv];
@@ -338,25 +674,24 @@ footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);paddi
       area: num('area'), nat: num('nat'), tmin: num('tmin'), rain: num('rain'), hum: num('hum'),
       m1p: num('m1p'), m1r: num('m1r'), m1n: num('m1n') };
   }
-
   function warnings(inp){
     const w = [], R = M.ranges;
     const chk = (v, r, label, unit) => { if (isFinite(v) && (v < r[0] || v > r[1])) w.push(`${label} (${v}${unit}) is outside the training range ${(+r[0]).toFixed(1)}–${(+r[1]).toFixed(1)}${unit}, so this result is an extrapolation.`); };
     chk(inp.tmin, R.tmin, 'Minimum temperature', ' °C'); chk(inp.rain, R.rain, 'Rainfall', ' mm/day'); chk(inp.hum, R.hum, 'Relative humidity', '%');
     chk(inp.area, R.area, 'Corn area', ' ha'); chk(inp.nat, R.national, 'National reports', '');
     if (state.mode === 'm'){ chk(inp.m1p, R.m1p, 'First-month province reports', ''); chk(inp.m1r, R.m1r, 'First-month region reports', ''); chk(inp.m1n, R.m1n, 'First-month national reports', ''); }
-    if (!inp.known) w.push(inp.region ? 'This province was not in the training data, so only its region effect is used. On unseen provinces the model reached AUC 0.799; treat the result as a lower-confidence estimate.' : 'No province or region effect is used, so this is the national-average estimate. Treat it as a rough guide.');
+    if (!inp.known) w.push(inp.region ? `This province was not in the training data, so only its region effect is used. On unseen provinces the model reached AUC ${M.quarterly.performance.new_province_auc}; treat the result as a lower-confidence estimate.` : 'No province or region effect is used, so this is the national-average estimate. Treat it as a rough guide.');
     return w;
   }
-
   function render(){
     const inp = readInputs();
+    $('toHistory').hidden = !inp.known;
     const need = ['area','nat','tmin','rain','hum'].concat(state.mode==='m'?['m1p','m1r','m1n']:[]);
     const missing = need.filter(k => !isFinite(inp[k]));
     const warn = $('warn');
     if (missing.length){
       $('prob').textContent = '–'; $('tier').textContent = 'Fill in all inputs'; $('tier').className = 'pill';
-      $('action').textContent = ''; $('drivers').innerHTML = ''; $('meta').innerHTML = ''; $('marker').style.left = '0%';
+      $('action').textContent = ''; $('farmSteps').innerHTML = ''; $('drivers').innerHTML = ''; $('meta').innerHTML = ''; $('marker').style.left = '0%';
       warn.innerHTML = state.mode === 'm' && missing.some(k => k.startsWith('m1')) ? '<span>Enter the number of BPI reports from the first month of the quarter (province, region and nationwide). These counts become available only after that month ends.</span>' : '<span>Some inputs are empty. Fill them in, or tap “Use latest data”.</span>';
       return;
     }
@@ -365,18 +700,18 @@ footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);paddi
     $('tier').textContent = t.name + ' Risk'; $('tier').className = 'pill ' + tierClass(t.name);
     $('marker').style.left = (Math.min(Math.max(r.p,0),1)*100) + '%';
     $('action').textContent = t.action;
+    $('farmSteps').innerHTML = stepsHTML(t); $('farmSteps').className = 'steps tone'; $('farmSteps').style.setProperty('--tc', `var(${tierVar[t.name]})`);
     $('resWhat').textContent = state.mode === 'q' ? `Outbreak probability, ${qNames[state.q]}` : `Outbreak probability, months 2–3 of ${qNames[state.q]}`;
     const maxAbs = Math.max(1, ...r.contrib.map(c => Math.abs(c[1])));
     $('drivers').innerHTML = r.contrib.map(([name, v]) => {
       const w = Math.min(50, Math.abs(v)/maxAbs*50);
       const dir = v > 0.02 ? 'raises' : (v < -0.02 ? 'lowers' : 'no effect');
-      return `<div class="drv"><span>${name} <span class="note">· ${dir}</span></span><div class="bar" title="${v.toFixed(2)} on the log-odds scale"><b class="${v>=0?'up':'down'}" style="width:${w}%"></b></div></div>`;
+      return `<div class="drv"><span>${name} <span class="note" style="display:inline">· ${dir}</span></span><div class="bar" title="${v.toFixed(2)} on the log-odds scale"><b class="${v>=0?'up':'down'}" style="width:${w}%"></b></div></div>`;
     }).join('');
     warn.innerHTML = warnings(inp).map(s => `<span>${s}</span>`).join('');
     const perf = (state.mode==='q'?M.quarterly:M.monthly).performance;
-    $('meta').innerHTML = `<span>z = ${r.z.toFixed(3)} · ${state.mode==='q'?'quarterly model (10 predictors)':'monthly update (13 predictors)'}</span><span>Tested accuracy: AUC ${perf.cv_auc} in cross-validation, ${perf.forward_auc} on later years.</span>`;
+    $('meta').innerHTML = `<span>z = ${r.z.toFixed(3)} · ${state.mode==='q'?'quarterly model (10 inputs)':'monthly update (13 inputs)'}</span><span>Tested accuracy: AUC ${perf.cv_auc} in cross-validation, ${perf.forward_auc} on later years.</span>`;
   }
-
   function setMode(m){
     state.mode = m;
     $('modeQ').setAttribute('aria-pressed', m==='q'); $('modeM').setAttribute('aria-pressed', m==='m');
@@ -391,71 +726,242 @@ footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);paddi
   }
   function setQ(q){ state.q = q; [1,2,3,4].forEach(i => $('q'+i).setAttribute('aria-pressed', i===q)); render(); }
   function setToggle(key, v){ state[key] = v; $(key+'1').setAttribute('aria-pressed', v===1); $(key+'0').setAttribute('aria-pressed', v===0); render(); }
-
   function fillLatest(){
-    const pv = $('prov').value;
-    const L = M.latest.provinces[pv] || null;
+    const pv = $('prov').value, L = M.latest.provinces[pv] || null;
     $('nat').value = M.latest.national_reports;
-    if (L){
-      $('tmin').value = L.tmin; $('rain').value = L.rain; $('hum').value = L.hum; $('area').value = L.area;
-      setToggle('lagY', L.lagY); setToggle('nbR', L.nbR);
-    }
+    if (L){ $('tmin').value = L.tmin; $('rain').value = L.rain; $('hum').value = L.hum; $('area').value = L.area; setToggle('lagY', L.lagY); setToggle('nbR', L.nbR); }
     setQ(+M.latest.forecast_for.slice(-1));
+  }
+  function openForecast(p){
+    $('prov').value = p; $('regOtherWrap').hidden = true; select(p);
+    setMode('q'); fillLatest(); go('forecast');
+  }
+
+  // ---------- selection shared by all views
+  function select(p){
+    if (!M.province_region[p]) return;
+    state.sel = p;
+    try{ localStorage.setItem('fawcast-prov', p); }catch(e){}
+    document.querySelectorAll('#map path.sel').forEach(el => el.classList.remove('sel'));
+    document.querySelectorAll(`#map path[data-p="${CSS.escape(p)}"]`).forEach(el => { el.classList.add('sel'); el.parentNode.appendChild(el); });
+    mapCard();
+    if ($('histProv').value !== p){ $('histProv').value = p; }
+    if (state.view === 'history') renderHistory();
+  }
+
+  // ---------- map view
+  function buildMap(){
+    const svg = $('map'); svg.setAttribute('viewBox', `0 0 ${A.map.w} ${A.map.h}`);
+    svg.innerHTML = A.map.provinces.map(g => {
+      const mod = !!M.province_region[g.n];
+      return `<path d="${g.d}" data-p="${g.n}"${mod ? ` class="mod" tabindex="0" role="button" aria-label="${g.n}"` : ''}><title>${g.n}${mod ? '' : ' (not modeled)'}</title></path>`;
+    }).join('');
+    svg.addEventListener('click', e => { const el = e.target.closest('path.mod'); if (el) select(el.dataset.p); });
+    svg.addEventListener('keydown', e => { const el = e.target.closest('path.mod'); if (el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); select(el.dataset.p); } });
+  }
+  function paintMap(){
+    const cls = s => s < .15 ? '--s1' : s < .35 ? '--s2' : s < .55 ? '--s3' : '--s4';
+    document.querySelectorAll('#map path').forEach(el => {
+      const p = el.dataset.p; let v = '--nomodel';
+      if (M.province_region[p]){
+        if (state.layer === 'risk'){ const o = outOf(p); if (o) v = mapVar[o.t.name]; }
+        else { const s = pastShare(p); if (s) v = cls(s.s); }
+      }
+      el.style.fill = `var(${v})`;
+    });
+    const L = M.latest;
+    if (state.layer === 'risk'){
+      $('mapEyebrow').textContent = `Forecast for ${L.forecast_for}, from ${L.based_on} data`;
+      $('mapTitle').textContent = 'Next-quarter risk map';
+      $('mapLegend').innerHTML = M.tiers.map(t => `<span><i style="background:var(${mapVar[t.name]})"></i>${t.name} (${tierRange(t)})</span>`).join('') + '<span><i style="background:var(--nomodel)"></i>Not modeled</span>';
+    } else {
+      $('mapEyebrow').textContent = `BPI reports, ${H.first} to ${M.latest.based_on}`;
+      $('mapTitle').textContent = 'Past outbreak map';
+      $('mapLegend').innerHTML = [['--s1','Below 15% of quarters'],['--s2','15–34%'],['--s3','35–54%'],['--s4','55% and above'],['--nomodel','Not modeled']].map(([v,l]) => `<span><i style="background:var(${v})"></i>${l}</span>`).join('');
+    }
+    mapCard();
+  }
+  function mapCard(){
+    const c = $('mapCard'), p = state.sel, o = p && outOf(p), s = p && pastShare(p);
+    if (!o){
+      const rows = outlook();
+      c.innerHTML = `<div class="card-h"><span class="eyebrow">Summary</span><h3>${M.latest.forecast_for} outlook</h3></div>
+        <div class="counts">${M.tiers.slice().reverse().map(t => `<div><span class="pill ${tierClass(t.name)}">${t.name}</span><b class="num">${rows.filter(x => x.t === t).length} provinces</b></div>`).join('')}</div>
+        <p class="note">Tap a province on the map to see its forecast.</p>`;
+      return;
+    }
+    c.innerHTML = `<div class="card-h"><span class="eyebrow">${M.region_names[o.reg]}</span><h3>${p}</h3></div>
+      <div class="row" style="align-items:flex-end;gap:14px"><div class="big">${fmtPct(o.prob)}<small style="font-size:1.1rem">%</small></div><span class="pill ${tierClass(o.t.name)}">${o.t.name} Risk</span></div>
+      <p class="note">Chance of an outbreak in ${M.latest.forecast_for}. Rank ${o.rank} of ${outlook().length}.</p>
+      <dl class="kv">
+        <dt>Outbreak in ${M.latest.based_on}</dt><dd>${o.v.lagY ? 'Yes' : 'No'}</dd>
+        <dt>Outbreak elsewhere in region</dt><dd>${o.v.nbR ? 'Yes' : 'No'}</dd>
+        <dt>Past outbreaks</dt><dd>${s.k} of ${s.n} quarters</dd>
+      </dl>
+      <div class="todo"><h3>What farmers should do</h3><ol class="steps tone" style="--tc:var(${tierVar[o.t.name]})">${stepsHTML(o.t, 3)}</ol></div>
+      <div class="row"><button type="button" class="btn" data-go="forecast">Open forecast</button><button type="button" class="btn ghost" data-go="history">See history</button></div>`;
+    c.querySelector('[data-go="forecast"]').onclick = () => openForecast(p);
+    c.querySelector('[data-go="history"]').onclick = () => { select(p); go('history'); };
+  }
+
+  // ---------- rankings view
+  function renderRankings(){
+    const f = $('regFilter').value, qy = $('search').value.trim().toLowerCase(), L = M.latest;
+    const all = outlook();
+    const rows = all.filter(x => (f === '__all' || x.reg === f) && (!qy || x.p.toLowerCase().includes(qy)));
+    $('rankEyebrow').textContent = `Based on BPI and NASA POWER data for ${L.based_on}`;
+    $('rankTitle').textContent = `${L.forecast_for} outlook${f === '__all' ? '' : ': ' + M.region_names[f]}`;
+    const n = rows.length || 1;
+    $('tierBar').innerHTML = M.tiers.slice().reverse().map(t => { const k = rows.filter(x => x.t === t).length; return k ? `<i style="flex:${k};background:var(${tierVar[t.name]})"></i>` : ''; }).join('');
+    $('tierKey').innerHTML = M.tiers.slice().reverse().map(t => `<span><i style="background:var(${tierVar[t.name]})"></i>${t.name} <b>${rows.filter(x => x.t === t).length}</b></span>`).join('');
+    $('rankNote').textContent = `Every province was run through the quarterly model with its own ${L.based_on} data and ${L.national_reports} BPI reports nationwide. Tap a province to open its forecast.`;
+    const groups = M.tiers.slice().reverse().map(t => {
+      const g = rows.filter(x => x.t === t); if (!g.length) return '';
+      const collapse = t.name === 'Low' && !state.showLow && !qy && f === '__all' && g.length > 8;
+      const shown = collapse ? g.slice(0, 5) : g;
+      return `<div class="tgroup"><div class="tg-head" style="color:var(${tierVar[t.name]})"><h3>${t.name}</h3><span>${tierRange(t)} · ${g.length} province${g.length>1?'s':''}</span></div>
+        <ol class="rlist">${shown.map(x => `<li><button type="button" data-p="${x.p}"><span class="rk">${x.rank}</span><span class="nm">${x.p}<small>${x.reg === 'NIR' || x.reg === 'CAR' || x.reg === 'BARMM' ? x.reg : 'Region ' + x.reg} · ${x.v.lagY ? 'outbreak' : 'no outbreak'} last quarter</small></span><span class="trk" style="color:var(${tierVar[t.name]})"><b style="width:${(x.prob*100).toFixed(1)}%"></b></span><span class="pc">${fmtPct(x.prob)}%</span></button></li>`).join('')}</ol>
+        ${collapse ? `<button type="button" class="more" id="showLow">Show all ${g.length} low-risk provinces</button>` : ''}</div>`;
+    }).join('');
+    $('rankList').innerHTML = groups || '<div class="tgroup empty">No province matches.</div>';
+    const sl = $('showLow'); if (sl) sl.onclick = () => { state.showLow = true; renderRankings(); };
+  }
+
+  // ---------- history view
+  function renderHistory(){
+    const p = $('histProv').value, h = H.provinces[p]; if (!h) return;
+    const n = h.y.length, ys = [...h.y].map(Number), k = ys.reduce((a,b) => a+b, 0);
+    let last = -1; ys.forEach((v,i) => { if (v) last = i; });
+    let mi = 0; h.mu.forEach((v,i) => { if (v > h.mu[mi]) mi = i; });
+    const right = ys.filter((v,i) => (h.p[i] >= 50 ? 1 : 0) === v).length;
+    $('histEyebrow').textContent = `${M.region_names[M.province_region[p]]} · ${qlabel(h.t[0])} to ${qlabel(h.t[n-1])}`;
+    $('histTitle').textContent = p;
+    $('histStats').innerHTML = [
+      [`${k} of ${n}`, 'quarters with an outbreak'],
+      [last >= 0 ? qlabel(h.t[last]) : 'None', 'most recent outbreak'],
+      [`${h.mu[mi]}`, `most municipalities reporting${h.mu[mi] ? ' (' + qlabel(h.t[mi]) + ')' : ''}`],
+      [`${right} of ${n}`, 'quarters the model got right']
+    ].map(([b,s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+    $('fitNote').textContent = `For ${p}, the model's estimate was on the correct side of 50% in ${right} of ${n} quarters. These estimates come from the model fitted to all the data, so they show how well it describes the past; the accuracy tests in About show how well it predicts new data.`;
+    const seas = [1,2,3,4].map(q => { const idx = h.t.map((t,i) => ((t-1)%4+1) === q ? i : -1).filter(i => i >= 0); const kk = idx.filter(i => ys[i]).length; return { q, kk, nn: idx.length }; });
+    $('season').innerHTML = seas.map(s => `<div><span>${qNames[s.q]}</span><span class="trk"><b style="width:${s.nn ? s.kk/s.nn*100 : 0}%"></b></span><em>${s.kk} of ${s.nn}</em></div>`).join('');
+    state.hi = null; drawChart();
+  }
+  function drawChart(){
+    const p = $('histProv').value, h = H.provinces[p]; if (!h) return;
+    const svg = $('chart'), W = Math.max(300, $('chartBox').clientWidth), n = h.y.length;
+    const L = 34, R = 8, T = 10, PH = 150, GAP = 14, BH = 60, XH = 22, Ht = T + PH + GAP + BH + XH;
+    const step = (W - L - R) / n, cx = i => L + step*(i + .5);
+    const py = v => T + PH - v/100*PH;
+    const maxMu = Math.max(2, ...h.mu), by = v => T + PH + GAP + BH - v/maxMu*BH;
+    svg.setAttribute('viewBox', `0 0 ${W} ${Ht}`); svg.setAttribute('height', Ht);
+    svg.setAttribute('aria-label', `Quarterly history for ${p}: outbreaks in ${[...h.y].filter(c => c==='1').length} of ${n} quarters, with the model's estimate for each quarter.`);
+    let s = '';
+    [0,50,100].forEach(v => { s += `<line x1="${L}" x2="${W-R}" y1="${py(v)}" y2="${py(v)}" stroke="var(--line)" ${v===50?'stroke-dasharray="4 4"':''}/><text x="${L-6}" y="${py(v)+4}" text-anchor="end">${v}%</text>`; });
+    s += `<line x1="${L}" x2="${W-R}" y1="${by(0)}" y2="${by(0)}" stroke="var(--line)"/><text x="${L-6}" y="${by(maxMu)+4}" text-anchor="end">${maxMu}</text><text x="${L-6}" y="${by(0)+4}" text-anchor="end">0</text>`;
+    if (state.hi != null) s += `<rect x="${L + step*state.hi}" y="${T}" width="${step}" height="${PH + GAP + BH}" fill="var(--soft)"/>`;
+    const bw = Math.max(2, Math.min(18, step*.6));
+    h.mu.forEach((v,i) => { if (v) s += `<rect x="${cx(i)-bw/2}" y="${by(v)}" width="${bw}" height="${by(0)-by(v)}" rx="1.5" fill="${v>=2?'var(--m-high)':'var(--muted)'}" opacity="${v>=2?1:.45}"/>`; });
+    s += `<polyline points="${h.p.map((v,i) => `${cx(i)},${py(v)}`).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>`;
+    h.p.forEach((v,i) => { s += h.y[i] === '1' ? `<circle cx="${cx(i)}" cy="${py(v)}" r="5" fill="var(--r-vhigh)" stroke="var(--surface)" stroke-width="1.5"/>` : `<circle cx="${cx(i)}" cy="${py(v)}" r="4.2" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.6"/>`; });
+    h.t.forEach((t,i) => { const qq = (t-1)%4+1; if (qq === 1 || (i === 0 && qq <= 2)) s += `<line x1="${L+step*i}" x2="${L+step*i}" y1="${by(0)}" y2="${by(0)+5}" stroke="var(--muted)"/><text x="${L+step*i+3}" y="${by(0)+17}">${2020 + Math.floor((t-1)/4)}</text>`; });
+    h.t.forEach((t,i) => { s += `<rect x="${L+step*i}" y="${T}" width="${step}" height="${PH+GAP+BH}" fill="transparent" data-i="${i}" style="cursor:pointer"/>`; });
+    svg.innerHTML = s;
+    const i = state.hi;
+    $('readout').innerHTML = i == null ? '<span class="note">Tap or hover a quarter.</span>'
+      : `<b>${qlabel(h.t[i])}</b> · ${h.y[i]==='1' ? '<span style="color:var(--r-vhigh);font-weight:700">Outbreak</span>' : 'No outbreak'} · ${h.mu[i]} municipalit${h.mu[i]===1?'y':'ies'} reporting · model estimate ${h.p[i].toFixed(1)}%`;
+  }
+  $('chart').addEventListener('click', e => { const r = e.target.closest('rect[data-i]'); if (r){ state.hi = +r.dataset.i; drawChart(); } });
+  $('chart').addEventListener('mousemove', e => { const r = e.target.closest('rect[data-i]'); if (r && +r.dataset.i !== state.hi){ state.hi = +r.dataset.i; drawChart(); } });
+
+  // ---------- about view
+  function renderAbout(){
+    $('trainedOn').textContent = M.trained_on.charAt(0).toLowerCase() + M.trained_on.slice(1);
+    const P = M.quarterly.performance;
+    $('stats').innerHTML = `<dt>Cross-validation AUC</dt><dd>${P.cv_auc}</dd><dt>Unseen provinces AUC</dt><dd>${P.new_province_auc}</dd><dt>Unseen years AUC</dt><dd>${P.new_year_auc}</dd><dt>Forecasting later years</dt><dd>${P.forward_auc}</dd><dt>Accuracy (CV)</dt><dd>${(P.cv_accuracy*100).toFixed(1)}%</dd><dt>Monthly update AUC</dt><dd>${M.monthly.performance.cv_auc}</dd>`;
+    const c = M.quarterly.coef;
+    const V = [
+      ['lagY','Outbreak last quarter','Yes if this province had an outbreak in the previous quarter.'],
+      ['nbR','Outbreak nearby','Yes if another province in the same region had one.'],
+      ['larea1','Corn area in reports','ln(1 + hectares of corn in the province\'s BPI reports last quarter). Per 1 unit on the log scale.'],
+      ['lnat1','National reporting effort','ln(1 + all BPI reports nationwide last quarter). Per 1 unit on the log scale.'],
+      ['tmin_l1','Minimum temperature','Average daily low last quarter, per 1 °C.'],
+      ['rain_l1','Rainfall','Average rainfall last quarter, per 1 mm/day.'],
+      ['hum_l1','Humidity','Average relative humidity last quarter, per 1%.'],
+      ['Q2','Season: Q2 (Apr–Jun)','Compared with Q1 (Jan–Mar).'],
+      ['Q3','Season: Q3 (Jul–Sep)','Compared with Q1 (Jan–Mar).'],
+      ['Q4','Season: Q4 (Oct–Dec)','Compared with Q1 (Jan–Mar).']
+    ];
+    $('varTable').innerHTML = V.map(([k,name,desc]) => { const b = c[k], or = Math.exp(b), up = b > 0;
+      return `<tr><td><b>${name}</b></td><td>${desc}</td><td class="${up?'up-t':'down-t'}">${up?'Raises risk':'Lowers risk'}</td><td class="num">×${or.toFixed(2)}</td></tr>`; }).join('');
+    $('levels').innerHTML = M.tiers.map(t => `<div class="level" style="color:var(${tierVar[t.name]});--tc:var(${tierVar[t.name]})"><span class="pill ${tierClass(t.name)}">${t.name} risk</span><h3>${tierRange(t).charAt(0).toUpperCase() + tierRange(t).slice(1)} chance</h3><ol class="steps tone">${stepsHTML(t)}</ol></div>`).join('');
+    $('tierGuide').innerHTML = M.tiers.map(t => `<div style="display:grid;gap:4px"><span class="pill ${tierClass(t.name)}">${t.name} · ${tierRange(t)}</span><span class="note">${t.action}</span></div>`).join('');
+  }
+
+  // ---------- navigation
+  const VIEWS = ['forecast','map','guide','rankings','history','about'];
+  function go(v, push){
+    if (!VIEWS.includes(v)) v = 'forecast';
+    state.view = v;
+    VIEWS.forEach(x => { $('v-'+x).hidden = x !== v; });
+    document.querySelectorAll('.nav button').forEach(b => b.toggleAttribute('aria-current', false));
+    const nb = document.querySelector(`.nav button[data-view="${v}"]`); if (nb) nb.setAttribute('aria-current','page');
+    if (v === 'history') renderHistory();
+    if (v === 'rankings') renderRankings();
+    if (v === 'map') paintMap();
+    if (push !== false){ try{ history.replaceState(null, '', '#' + v); }catch(e){} }
+    window.scrollTo({top:0, behavior:'auto'});
   }
 
   function buildSelectors(){
     const byReg = {};
     Object.entries(M.province_region).forEach(([p,r]) => (byReg[r] = byReg[r] || []).push(p));
     const order = Object.keys(M.region_names);
-    $('prov').innerHTML = order.filter(r => byReg[r]).map(r => `<optgroup label="${M.region_names[r]}">${byReg[r].sort().map(p => `<option value="${p}">${p}</option>`).join('')}</optgroup>`).join('')
-      + `<optgroup label="Other"><option value="__other">My province is not listed</option></optgroup>`;
+    const opts = order.filter(r => byReg[r]).map(r => `<optgroup label="${M.region_names[r]}">${byReg[r].sort().map(p => `<option value="${p}">${p}</option>`).join('')}</optgroup>`).join('');
+    $('prov').innerHTML = opts + `<optgroup label="Other"><option value="__other">My province is not listed</option></optgroup>`;
+    $('histProv').innerHTML = opts;
     $('regOther').innerHTML = order.map(r => `<option value="${r}">${M.region_names[r]}</option>`).join('') + '<option value="__none">Not sure / none</option>';
     $('regFilter').innerHTML = '<option value="__all">All regions</option>' + order.filter(r => byReg[r]).map(r => `<option value="${r}">${M.region_names[r]}</option>`).join('');
   }
 
-  function renderOutlook(){
-    const f = $('regFilter').value, L = M.latest, fq = +L.forecast_for.slice(-1);
-    const rows = Object.entries(L.provinces).map(([p, v]) => {
-      const r = score('q', { province:p, known:true, region:M.province_region[p], q:fq, lagY:v.lagY, nbR:v.nbR, area:v.area, nat:L.national_reports, tmin:v.tmin, rain:v.rain, hum:v.hum });
-      return { p, reg: M.province_region[p], v, prob: r.p, t: tierOf(r.p) };
-    }).filter(x => f === '__all' || x.reg === f).sort((a,b) => b.prob - a.prob);
-    $('outlook').innerHTML = rows.map((x,i) => `<tr data-p="${x.p}"><td class="num">${i+1}</td><td>${x.p}</td><td>${x.reg}</td><td>${x.v.lagY ? 'Outbreak' : 'No outbreak'}</td><td class="num">${fmtPct(x.prob)}%<span class="minibar ${tierClass(x.t.name)}" style="width:${Math.round(x.prob*60)}px;background:none;border-top:8px solid currentColor;height:0"></span></td><td><span class="pill ${tierClass(x.t.name)}">${x.t.name}</span></td></tr>`).join('');
-    const counts = M.tiers.map(t => `${rows.filter(x => x.t.name===t.name).length} ${t.name}`).join(' · ');
-    $('outlookTitle').textContent = `${L.forecast_for.replace(' ', ' ')} outlook${f==='__all' ? ' for all 55 provinces' : ''}`;
-    $('outlookEyebrow').textContent = `Based on BPI and NASA POWER data for ${L.based_on}`;
-    $('outlookNote').textContent = `Quarterly model with each province's ${L.based_on} data and ${L.national_reports} BPI reports nationwide. ${counts}. Tap a province to open it above.`;
-  }
-
   function boot(){
-    buildSelectors();
-    $('trainedOn').textContent = M.trained_on.charAt(0).toLowerCase() + M.trained_on.slice(1);
+    H = M.history || A.history; OUT = null;
+    buildSelectors(); buildMap(); renderAbout();
     $('ver').textContent = M.version;
-    const P = M.quarterly.performance;
-    $('stats').innerHTML = `<dt>Cross-validation AUC</dt><dd>${P.cv_auc}</dd><dt>Unseen provinces AUC</dt><dd>${P.new_province_auc}</dd><dt>Unseen years AUC</dt><dd>${P.new_year_auc}</dd><dt>Forecasting later years</dt><dd>${P.forward_auc}</dd><dt>Accuracy (CV)</dt><dd>${(P.cv_accuracy*100).toFixed(1)}%</dd><dt>Monthly update AUC</dt><dd>${M.monthly.performance.cv_auc}</dd>`;
+    document.querySelectorAll('.nav button').forEach(b => b.onclick = () => go(b.dataset.view));
     $('modeQ').onclick = () => setMode('q'); $('modeM').onclick = () => setMode('m');
     [1,2,3,4].forEach(i => $('q'+i).onclick = () => setQ(i));
     ['lagY','nbR'].forEach(k => { $(k+'1').onclick = () => setToggle(k,1); $(k+'0').onclick = () => setToggle(k,0); });
-    $('prov').onchange = () => { $('regOtherWrap').hidden = $('prov').value !== '__other'; try{ localStorage.setItem('fawcast-prov', $('prov').value); }catch(e){} if ($('prov').value !== '__other') fillLatest(); else render(); };
+    $('prov').onchange = () => { const v = $('prov').value; $('regOtherWrap').hidden = v !== '__other'; if (v !== '__other'){ select(v); fillLatest(); } else render(); };
     $('regOther').onchange = render;
     $('fillLatest').onclick = fillLatest;
     $('form').addEventListener('input', render);
     $('form').addEventListener('submit', e => e.preventDefault());
-    $('regFilter').onchange = renderOutlook;
-    $('outlook').onclick = e => { const tr = e.target.closest('tr'); if (!tr) return; $('prov').value = tr.dataset.p; $('regOtherWrap').hidden = true; setMode('q'); fillLatest(); $('form').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); };
+    $('toGuide').onclick = () => go('guide');
+    $('toHistory').onclick = () => { select($('prov').value); go('history'); };
+    $('layerRisk').onclick = () => { state.layer = 'risk'; $('layerRisk').setAttribute('aria-pressed', true); $('layerPast').setAttribute('aria-pressed', false); paintMap(); };
+    $('layerPast').onclick = () => { state.layer = 'past'; $('layerPast').setAttribute('aria-pressed', true); $('layerRisk').setAttribute('aria-pressed', false); paintMap(); };
+    $('regFilter').onchange = () => { state.showLow = false; renderRankings(); };
+    $('search').addEventListener('input', renderRankings);
+    $('rankList').addEventListener('click', e => { const b = e.target.closest('button[data-p]'); if (b) openForecast(b.dataset.p); });
+    $('histProv').onchange = () => select($('histProv').value);
+    let rt = null; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (state.view === 'history') drawChart(); }, 120); });
+
     let saved = null, savedMode = null;
     try{ saved = localStorage.getItem('fawcast-prov'); savedMode = localStorage.getItem('fawcast-mode'); }catch(e){}
-    $('prov').value = (saved && (M.province_region[saved] || saved==='__other')) ? saved : 'Isabela';
-    $('regOtherWrap').hidden = $('prov').value !== '__other';
+    const start = (saved && M.province_region[saved]) ? saved : 'Isabela';
+    $('prov').value = start; $('regOtherWrap').hidden = true; $('histProv').value = start;
+    state.sel = start;
     fillLatest();
-    renderOutlook();
     setMode(savedMode === 'm' ? 'm' : 'q');
+    state.sel = null;   // map opens on the national summary until a province is tapped
+    const hv = (location.hash || '').slice(1);
+    go(VIEWS.includes(hv) ? hv : 'forecast', false);
+    window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (VIEWS.includes(v) && v !== state.view) go(v, false); });
   }
 
   // Use a retrained model.json placed next to the app, if one exists
-  function start(){
-    fetch('model.json', {cache:'no-store'}).then(r => r.ok ? r.json() : null).then(j => { if (j && j.quarterly && j.monthly) M = j; }).catch(() => {}).finally(boot);
-  }
-  start();
+  fetch('model.json', {cache:'no-store'}).then(r => r.ok ? r.json() : null).then(j => { if (j && j.quarterly && j.monthly) M = j; }).catch(() => {}).finally(boot);
 
   // Installable app support (only active when hosted as a web app)
   let deferred = null;

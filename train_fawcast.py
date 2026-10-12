@@ -242,6 +242,13 @@ def main():
     model['national_reports_by_quarter'] = {qlabel(t): int(v) for t, v in sorted(NAT.items())}
     model['means'] = {k: float(q[k].mean()) for k in FM}
     model['region_names'] = REGION_NAMES
+    # quarter-by-quarter history for the app's History page (model estimates use the final fitted model)
+    cq = model['quarterly']; zc = cq['coef']['intercept'] + sum(cq['coef'][f] * q[f].values.astype(float) for f in F)
+    zc = zc + q.Region.map(cq['u_region']).fillna(0).values + q.Province.map(lambda p: cq['u_province'].get(nice(p), 0)).values
+    q['_p'] = 1 / (1 + np.exp(-zc))
+    model['history'] = {'first': qlabel(int(q.t.min())), 'provinces': {
+        nice(p): {'t': [int(v) for v in g.t], 'y': ''.join(str(int(v)) for v in g.Y), 'mu': [int(v) for v in g.muni],
+                  'p': [round(float(v) * 100, 1) for v in g._p]} for p, g in q.sort_values('t').groupby('Province')}}
     json.dump(model, open(a.out, 'w'), indent=1)
     print(f"Wrote {a.out}. Latest data: {qlabel(T_last)}; the app will forecast {qlabel(T_last + 1)}.")
 
